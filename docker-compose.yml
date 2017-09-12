@@ -1,0 +1,52 @@
+version: '3.1'
+
+services:
+
+  redmine:
+    image: informea/redmine:latest
+    container_name: redmine
+    restart: always
+    ports:
+      - 8080:3000
+    volumes:
+      - redmine-files:/usr/src/redmine/files
+      - redmine-tmp:/usr/src/redmine/tmp
+      - redmine-github:/var/local/redmine/github/
+    depends_on:
+      - mysql
+    environment:
+      TZ: "Europe/Zurich"
+      REDMINE_PLUGINS_MIGRATE: "true"
+    env_file:
+      - .redmine.secret
+
+  mysql:
+    image: mysql:5.5
+    container_name: redmine_mysql
+    restart: always
+    volumes:
+    - mysql-data:/var/lib/mysql
+    environment:
+      TZ: "Europe/Zurich"
+    env_file:
+      - .redmine.secret
+    command:
+    - "--character-set-server=utf8"
+    - "--collation-server=utf8_unicode_ci"
+    - "--query-cache-size=0"
+    - "--query-cache-limit=64M"
+    - "--query-cache-type=0"
+    - "--innodb-buffer-pool-size=1G"
+    - "--innodb-buffer-pool-instances=4"
+    - "--net-read-timeout=7200"
+    - "--net-write-timeout=7200"
+    - "--max-allowed-packet=128M"
+    - "--tmp-table-size=384M"
+    - "--max-heap-table-size=384M"
+    - "--join-buffer-size=256M"
+
+volumes:
+  redmine-files:
+  redmine-tmp:
+  redmine-github:
+  mysql-data:
