@@ -9,16 +9,22 @@
 ### First time installation
 
 Clone the repository
+
     cd /var/local/deploy
     git clone https://github.com/informea/redmine.docker
     cd redmine.docker
 
+
 Edit the secrets
-    .redmine.secret
+
+    cp .redmine.secret.example .redmine.secret
+    vim .redmine.secret
 
 
 Start redmine
+
     docker-compose up -d
+
 
 Initial configuration
 

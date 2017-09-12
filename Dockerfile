@@ -17,9 +17,9 @@ COPY plugins/redmine_agile-1_4_5-light.zip plugins/redmine_checklists-3_1_7-ligh
 
 RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && mkdir -p ${REDMINE_LOCAL_PATH}/scripts \
- && git clone --branch 2.2.0 https://github.com/koppen/redmine_github_hook.git ${REDMINE_PATH}/plugins/redmine_github_hook \
+ && git clone --branch v2.2.0 https://github.com/koppen/redmine_github_hook.git ${REDMINE_PATH}/plugins/redmine_github_hook \
  && git clone https://github.com/Ilogeek/redmine_issue_dynamic_edit.git ${REDMINE_PATH}/plugins/redmine_issue_dynamic_edit \
- && git clone --branch 1.1.15 https://github.com/a-ono/redmine_ckeditor.git ${REDMINE_PATH}/plugins/redmine_ckeditor \
+ && git clone --branch 1.1.5 https://github.com/a-ono/redmine_ckeditor.git ${REDMINE_PATH}/plugins/redmine_ckeditor \
  && git clone --branch 1.0.9 https://framagit.org/infopiiaf/redhopper.git ${REDMINE_PATH}/plugins/redhopper \
  && cd /usr/src/redmine \
  && gem install bundler --pre \
