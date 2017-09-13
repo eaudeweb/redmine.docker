@@ -7,7 +7,7 @@ services:
     container_name: redmine
     restart: always
     ports:
-      - 8080:3000
+      - 8090:3000
     volumes:
       - redmine-files:/usr/src/redmine/files
       - redmine-tmp:/usr/src/redmine/tmp
