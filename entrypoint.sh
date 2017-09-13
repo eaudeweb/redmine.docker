@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Generated environment for CRON jobs
+/usr/bin/printenv | sed 's/^\(.*\)$/export \1/g' | grep -E "^export RECEIVE_IMAP" > /var/local/redmine/scripts/receive_imap_env.sh
+/usr/bin/printenv | sed 's/^\(.*\)$/export \1/g' | grep -E "^export SYNC_" > /var/local/redmine/scripts/redmine_github_sync_env.sh
+
 # Start cron in background
 /usr/sbin/cron
 
