@@ -16,6 +16,7 @@ with open(CONFIG_FILE_IN) as f:
 data['default']['email_delivery'] = {
     'delivery_method': ':smtp',
     'smtp_settings': {
+        'ssl': 'true',
         'enable_starttls_auto': 'true',
         'address': os.environ.get('SMTP_HOST', 'smtp.gmail.com'),
         'port': os.environ.get('SMTP_PORT', 587),
