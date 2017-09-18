@@ -12,4 +12,5 @@ export BUNDLE_PATH=/usr/local/bundle
 	username=${RECEIVE_IMAP_USERNAME} password=${RECEIVE_IMAP_PASSWORD} \
 	project=informea tracker=task status=new priority=normal category=helpdesk \
 	allow_override=project,tracker,status,priority \
+	unknown_user=create no_permission_check=1 \
 	move_on_success=DONE
