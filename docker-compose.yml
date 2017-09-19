@@ -12,6 +12,8 @@ services:
       - redmine-files:/usr/src/redmine/files
       - redmine-tmp:/usr/src/redmine/tmp
       - redmine-github:/var/local/redmine/github/
+      - redmine-backup:/var/local/redmine/backup/
+      - redmine-logs:/usr/src/redmine/log/
     depends_on:
       - mysql
     environment:
@@ -26,6 +28,7 @@ services:
     restart: always
     volumes:
     - mysql-data:/var/lib/mysql
+    - redmine-backup:/var/local/backup/
     environment:
       TZ: "Europe/Zurich"
     env_file:
@@ -47,6 +50,8 @@ services:
 
 volumes:
   redmine-files:
+  redmine-logs:
+  redmine-backup:
   redmine-tmp:
   redmine-github:
   mysql-data:
