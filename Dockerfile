@@ -31,5 +31,9 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
 COPY entrypoint.sh scripts/receive_imap.sh scripts/redmine_github_sync.sh scripts/redmine.py scripts/update_configuration.py ${REDMINE_LOCAL_PATH}/scripts/
 COPY redmine.crontab ${REDMINE_LOCAL_PATH}/
 
+WORKDIR $REDMINE_PATH
+ADD http://www.redmine.org/attachments/download/18944/allow_watchers_and_contributers_access_to_issues_3.4.2.patch ${REDMINE_PATH}
+RUN patch -p0 < allow_watchers_and_contributers_access_to_issues_3.4.2.patch
+
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]
 CMD []

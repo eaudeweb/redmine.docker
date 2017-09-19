@@ -1,0 +1,161 @@
+diff -Naur app/models/issue.rb ./app/models/issue.rb
+--- app/models/issue.rb	2015-12-06 15:06:19.000000000 +0100
++++ app/models/issue.rb	2016-04-06 10:05:57.755051963 +0200
+@@ -132,6 +132,12 @@
+         when 'own'
+           user_ids = [user.id] + user.groups.map(&:id).compact
+           "(#{table_name}.author_id = #{user.id} OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}))"
++        when 'own_watch'
++          user_ids = [user.id] + user.groups.map(&:id)
++          "(#{table_name}.author_id = #{user.id} OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}) OR #{table_name}.id IN (SELECT watchable_id FROM watchers WHERE user_id=#{user.id} AND watchable_type = 'Issue'))"
++        when 'own_watch_contributed'
++          user_ids = [user.id] + user.groups.map(&:id)
++          "(#{table_name}.author_id = #{user.id} OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}) OR #{table_name}.id IN (SELECT watchable_id FROM watchers WHERE user_id=#{user.id} AND watchable_type = 'Issue') OR #{table_name}.id IN (SELECT journalized_id FROM journals where journalized_type = 'Issue' AND user_id=#{user.id} GROUP BY journalized_id))"
+         else
+           '1=0'
+         end
+@@ -161,6 +167,10 @@
+           !self.is_private? || (self.author == user || user.is_or_belongs_to?(assigned_to))
+         when 'own'
+           self.author == user || user.is_or_belongs_to?(assigned_to)
++        when 'own_watch'
++          self.author == user || user.is_or_belongs_to?(assigned_to) || self.watched_by?(user)
++        when 'own_watch_contributed'
++          self.author == user || user.is_or_belongs_to?(assigned_to) || self.watched_by?(user) || self.journals.where('journalized_id = ?', self.id).where('user_id = ?', user).count > 0
+         else
+           false
+         end
+diff -Naur app/models/role.rb ./app/models/role.rb
+--- app/models/role.rb	2015-12-06 15:06:18.000000000 +0100
++++ app/models/role.rb	2016-04-06 10:05:57.755051963 +0200
+@@ -38,7 +38,9 @@
+   ISSUES_VISIBILITY_OPTIONS = [
+     ['all', :label_issues_visibility_all],
+     ['default', :label_issues_visibility_public],
+-    ['own', :label_issues_visibility_own]
++    ['own', :label_issues_visibility_own],
++    ['own_watch', :label_issues_visibility_own_watch],
++    ['own_watch_contributed', :label_issues_visibility_own_watch_contributed]
+   ]
+
+   TIME_ENTRIES_VISIBILITY_OPTIONS = [
+diff -Naur config/locales/en.yml ./config/locales/en.yml
+--- config/locales/en.yml	2015-12-06 15:06:23.000000000 +0100
++++ config/locales/en.yml	2016-04-06 10:12:27.884900611 +0200
+@@ -462,6 +462,7 @@
+   setting_new_item_menu_tab: Project menu tab for creating new objects
+   setting_commit_logs_formatting: Apply text formatting to commit messages
+   setting_timelog_required_fields: Required fields for time logs
++  setting_enable_watcher_issue_visibility: Enable watcher issue visibility
+
+   permission_add_project: Create project
+   permission_add_subprojects: Create subprojects
+@@ -1019,6 +1019,8 @@
+   label_font_monospace: Monospaced font
+   label_font_proportional: Proportional font
+   label_last_notes: Last notes
++  label_issues_visibility_own_watch: Issues created by, assigned to, or watched by the user
++  label_issues_visibility_own_watch_contributed: Issues created by, assigned to, watched by, or contributed to by the user
+
+   button_login: Login
+   button_submit: Submit
+diff -Naur test/unit/issue_test.rb ./test/unit/issue_test.rb
+--- test/unit/issue_test.rb	2015-12-06 15:06:17.000000000 +0100
++++ test/unit/issue_test.rb	2016-04-06 10:05:57.756051955 +0200
+@@ -278,6 +278,40 @@
+     assert_visibility_match user, issues
+   end
+
++  def test_visible_scope_for_non_member_with_own_watch_issues_visibility
++    #Role.non_member.add_permission! :view_issues
++    Role.non_member.update! :issues_visibility, 'own_watch'
++    user = User.find(9)
++    assert user.projects.empty?
++    own_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => user.id, :subject => 'Issue by non member')
++    watching_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue watched by non member')
++    watching_issue.add_watcher(user)
++
++    #assert_equal true, own_issue.visible?(user)
++    #assert_equal true, watching_issue.visible?(user)
++    assert_visibility_match user, [own_issue, watching_issue]
++  end
++
++  def test_visible_scope_for_non_member_with_own_watch_contributed_issues_visibility
++    #Role.non_member.add_permission! :view_issues
++    Role.non_member.update! :issues_visibility, 'own_watch_contributed'
++    user = User.find(9)
++    assert user.projects.empty?
++    own_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => user.id, :subject => 'Issue by non member')
++    watching_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue watched by non member')
++    watching_issue.add_watcher(user)
++    watching_issue.reload
++    contributed_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue contributed by non member')
++    journal = contributed_issue.init_journal(user)
++    journal.notes = 'journal notes'
++    journal.save!
++
++    #assert_equal true, own_issue.visible?(user)
++    #assert_equal true, watching_issue.visible?(user)
++    #assert_equal true, contributed_issue.visible?(user)
++    assert_visibility_match user, [own_issue, watching_issue, contributed_issue]
++  end
++
+   def test_visible_scope_for_non_member_without_view_issues_permissions
+     # Non member user should not see issues without permission
+     Role.non_member.remove_permission!(:view_issues)
+@@ -356,17 +389,44 @@
+         :assigned_to => group,
+         :is_private => true)
+
+-      Role.find(2).update! :issues_visibility => 'default'
+-      issues = Issue.visible(User.find(8)).to_a
+-      assert issues.any?
+-      assert issues.include?(issue)
+-
+-      Role.find(2).update! :issues_visibility => 'own'
+-      issues = Issue.visible(User.find(8)).to_a
+-      assert issues.any?
+-      assert_include issue, issues
+-    end
+-  end
++      ['default', 'own', 'own_watch', 'own_watch_contributed'].each do |issue_visibility|
++        Role.find(2).update! :issues_visibility => issue_visibility
++        issues = Issue.visible(User.find(8)).to_a
++        assert issues.any?
++        assert issues.include?(issue)
++      end
++    end
++  end
++
++  def test_visible_scope_for_non_member_and_watcher_should_return_watching_issues
++    user = User.find(9)
++    assert user.projects.empty?
++    Role.non_member.add_permission!(:view_issues)
++
++    issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue visible to watcher', :is_private => true)
++    issue.add_watcher(user)
++
++    ['own_watch', 'own_watch_contributed'].each do |issue_visibility|
++      Role.non_member.update! :issues_visibility => issue_visibility
++      issues = Issue.visible(user).to_a
++      assert issues.any?
++      assert issues.include?(issue)
++    end
++  end
++
++  def test_visible_scope_for_non_member_and_contributer_should_return_contributing_issues
++    user = User.find(9)
++    assert user.projects.empty?
++    Role.non_member.add_permission!(:view_issues)
++
++    issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue visible to watcher', :is_private => true)
++    journal = issue.init_journal(user)
++    journal.notes = 'journal notes'
++    journal.save!
++
++    Role.non_member.update! :issues_visibility, 'own_watch_contributed'
++    issues = Issue.visible(user).to_a
++  end
+
+   def test_visible_scope_for_member_with_limited_tracker_ids
+     role = Role.find(1)
