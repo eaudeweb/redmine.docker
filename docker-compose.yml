@@ -3,7 +3,7 @@ version: '2.0'
 services:
 
   redmine:
-    image: informea/redmine:latest
+    image: edw_redmine:latest
     container_name: redmine
     restart: always
     ports:
@@ -17,7 +17,7 @@ services:
     depends_on:
       - mysql
     environment:
-      TZ: "Europe/Zurich"
+      TZ: "Europe/Bucharest"
       REDMINE_PLUGINS_MIGRATE: "true"
     env_file:
       - .redmine.secret
@@ -30,7 +30,7 @@ services:
     - mysql-data:/var/lib/mysql
     - redmine-backup:/var/local/backup/
     environment:
-      TZ: "Europe/Zurich"
+      TZ: "Europe/Bucharest"
     env_file:
       - .redmine.secret
     command:
