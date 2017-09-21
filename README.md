@@ -45,6 +45,6 @@ Redmine Update
 Redmine update from 2.6.3 to 3.4 (latest stable). Author: Andra Necula
 
 [![Docker]( https://dockerbuildbadges.quelltext.eu/status.svg?organization=aneculab&repository=redmine.docker)]
-(https://hub.docker.com/r/eaudeweb/redmine.docker/builds)
+(https://hub.docker.com/r/anecula/redmine.docker/builds)
 
 2017
