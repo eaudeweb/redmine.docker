@@ -1,4 +1,4 @@
-## InforMEA Redmine setup (support.informea.org)
+## Eau de Web Redmine setup (helpdesk.eaudeweb.ro)
 
 
 ### Prerequisites
@@ -11,7 +11,7 @@
 Clone the repository
 
     cd /var/local/deploy
-    git clone https://github.com/informea/redmine.docker
+    git clone https://github.com/eaudeweb/redmine.docker
     cd redmine.docker
 
 
@@ -37,12 +37,6 @@ Initial configuration
 - Configure trackers and workflows
 - Add users
 - etc.
-
-Redmine Update
-============
-
-
-Redmine update from 2.6.3 to 3.4 (latest stable). Mainterner: Andra Necula
 
 [![Docker](https://dockerbuildbadges.quelltext.eu/status.svg?organization=eaudeweb&repository=redmine.docker)](https://hub.docker.com/r/eaudeweb/redmine.docker/builds)
 
