@@ -3,7 +3,7 @@ version: '2.0'
 services:
 
   redmine:
-    image: edw_redmine:latest
+    image: anecula/edw_redmine:latest
     container_name: redmine
     restart: always
     ports:
@@ -26,6 +26,8 @@ services:
     image: mysql:5.5
     container_name: redmine_mysql
     restart: always
+    ports:
+    - 13306
     volumes:
     - mysql-data:/var/lib/mysql
     - redmine-backup:/var/local/backup/
@@ -55,3 +57,4 @@ volumes:
   redmine-tmp:
   redmine-github:
   mysql-data:
+  

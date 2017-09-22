@@ -20,7 +20,6 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && mkdir -p ${REDMINE_LOCAL_PATH}/backup \
  && git clone --branch v2.2.0 https://github.com/koppen/redmine_github_hook.git ${REDMINE_PATH}/plugins/redmine_github_hook \
  && git clone https://github.com/Ilogeek/redmine_issue_dynamic_edit.git ${REDMINE_PATH}/plugins/redmine_issue_dynamic_edit \
-# && git clone --branch 1.1.5 https://github.com/a-ono/redmine_ckeditor.git ${REDMINE_PATH}/plugins/redmine_ckeditor \
  && git clone --branch 1.0.9 https://framagit.org/infopiiaf/redhopper.git ${REDMINE_PATH}/plugins/redhopper \
  && git clone https://github.com/foton/redmine_watcher_groups.git ${REDMINE_PATH}/plugins/redmine_watcher_groups \
  && cd /usr/src/redmine \
