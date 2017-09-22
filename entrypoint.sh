@@ -16,4 +16,8 @@ done
 
 /var/local/redmine/scripts/update_configuration.py
 
+gem install bundler --pre
+
+bundle install
+
 /docker-entrypoint.sh rails server -b 0.0.0.0

@@ -18,11 +18,12 @@ COPY plugins/* ${REDMINE_LOCAL_PATH}/plugins/
 RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && mkdir -p ${REDMINE_LOCAL_PATH}/scripts \
  && mkdir -p ${REDMINE_LOCAL_PATH}/backup \
- && git clone --branch v2.2.0 https://github.com/koppen/redmine_github_hook.git ${REDMINE_PATH}/plugins/redmine_github_hook \
- && git clone https://github.com/Ilogeek/redmine_issue_dynamic_edit.git ${REDMINE_PATH}/plugins/redmine_issue_dynamic_edit \
- && git clone --branch 1.0.9 https://framagit.org/infopiiaf/redhopper.git ${REDMINE_PATH}/plugins/redhopper \
- && git clone https://github.com/foton/redmine_watcher_groups.git ${REDMINE_PATH}/plugins/redmine_watcher_groups \
- && cd /usr/src/redmine \
+ && cd ${REDMINE_PATH}/plugins \
+ && git clone --branch v2.2.0 https://github.com/koppen/redmine_github_hook.git \
+ && git clone https://github.com/Ilogeek/redmine_issue_dynamic_edit.git \
+ && git clone --branch 1.0.9 https://framagit.org/infopiiaf/redhopper.git \
+ && git clone https://github.com/foton/redmine_watcher_groups.git \
+ && cd ${REDMINE_PATH} \
  && gem install bundler --pre \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_4_5-light.zip \
@@ -33,8 +34,11 @@ COPY entrypoint.sh scripts/receive_imap.sh scripts/redmine_github_sync.sh script
 COPY redmine.crontab ${REDMINE_LOCAL_PATH}/
 
 WORKDIR $REDMINE_PATH
-ADD http://www.redmine.org/attachments/download/18944/allow_watchers_and_contributers_access_to_issues_3.4.2.patch ${REDMINE_PATH}
-RUN patch -p0 < allow_watchers_and_contributers_access_to_issues_3.4.2.patch
+ADD http://www.redmine.org/attachments/download/18944/allow_watchers_and_contributers_access_to_issues_3.4.2.patch \
+	patches/imap_scan_multiple_folders.patch \
+	${REDMINE_PATH}/
+RUN patch -p0 < allow_watchers_and_contributers_access_to_issues_3.4.2.patch \
+  && patch -p0 < imap_scan_multiple_folders.patch
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]
 CMD []

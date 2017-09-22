@@ -20,8 +20,8 @@ data['default']['email_delivery'] = {
         'enable_starttls_auto': 'true',
         'address': os.environ.get('SMTP_HOST', 'smtp.gmail.com'),
         'port': os.environ.get('SMTP_PORT', 587),
-        'domain': os.environ.get('SMTP_DOMAIN', 'support.informea.org'),
-        'authentication': ':plain',
+        'domain': os.environ.get('SMTP_DOMAIN', 'helpdesk.eaudeweb.ro'),
+        'authentication': ':login',
         'user_name': os.environ.get('SMTP_USERNAME', 'username'),
         'password': os.environ.get('SMTP_PASSWORD', 'secret'),
     }
