@@ -25,6 +25,9 @@ Start redmine
 
     docker-compose up -d
 
+For local development
+
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 Initial configuration
 

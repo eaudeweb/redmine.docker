@@ -1,0 +1,12 @@
+version: '2.0'
+
+services:
+
+  redmine:
+    container_name: redmine
+    ports:
+      - 8090:3000
+
+  mysql:
+    container_name: redmine_mysql
+

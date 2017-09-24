@@ -4,10 +4,7 @@ services:
 
   redmine:
     image: eaudeweb/redmine.docker
-    container_name: redmine
     restart: always
-    ports:
-      - 8090:3000
     volumes:
       - redmine-files:/usr/src/redmine/files
       - redmine-tmp:/usr/src/redmine/tmp
@@ -24,7 +21,6 @@ services:
 
   mysql:
     image: mysql:5.5
-    container_name: redmine_mysql
     restart: always
     volumes:
     - mysql-data:/var/lib/mysql
