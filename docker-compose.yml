@@ -3,7 +3,7 @@ version: '2.0'
 services:
 
   redmine:
-    image: eaudeweb/redmine.docker
+    image: eaudeweb/redmine
     restart: always
     volumes:
       - redmine-files:/usr/src/redmine/files

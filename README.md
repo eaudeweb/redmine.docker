@@ -41,6 +41,6 @@ Initial configuration
 - Add users
 - etc.
 
-[![Docker](https://dockerbuildbadges.quelltext.eu/status.svg?organization=eaudeweb&repository=redmine.docker)](https://hub.docker.com/r/eaudeweb/redmine.docker/builds)
+[![Docker](https://dockerbuildbadges.quelltext.eu/status.svg?organization=eaudeweb&repository=redmine)](https://hub.docker.com/r/eaudeweb/redmine/builds)
 
 2017
