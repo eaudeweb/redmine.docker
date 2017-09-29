@@ -23,6 +23,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/Ilogeek/redmine_issue_dynamic_edit.git \
  && git clone --branch 1.0.9 https://framagit.org/infopiiaf/redhopper.git \
  && git clone https://github.com/foton/redmine_watcher_groups.git \
+ && git clone https://github.com/akiko-pusu/redmine_banner.git \
  && cd ${REDMINE_PATH} \
  && gem install bundler --pre \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
