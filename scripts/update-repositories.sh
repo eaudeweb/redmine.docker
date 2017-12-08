@@ -46,7 +46,8 @@ redmine_update() {
 
 # Clone repositories
 clone_or_update() {
-	for repo in $REPO_LIST
+
+	for repo in ${REPO_LIST}
 	do
 		DIRNAME=`basename ${repo}`
 		REPO_DESTDIR="${REPO_BASEDIR}${DIRNAME}.git"

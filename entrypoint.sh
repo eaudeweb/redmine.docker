@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 # Generated environment for CRON jobs
-/usr/bin/printenv | sed 's/^\(.*\)$/export \1/g' | grep -E "^export TZ|RECEIVE_IMAP" > /var/local/redmine/scripts/receive_imap_env.sh
-/usr/bin/printenv | sed 's/^\(.*\)$/export \1/g' | grep -E "^export TZ|GIT_SYNC_" > /var/local/redmine/scripts/update-repositories.env.sh
+echo "export TZ=\"${TZ}\""  >> /var/local/redmine/scripts/update-repositories-env.sh
+echo "export GIT_SYNC_FOLDER=\"${GIT_SYNC_FOLDER}\""  >> /var/local/redmine/scripts/update-repositories-env.sh
+echo "export GIT_SYNC_REPO_LIST=\"${GIT_SYNC_REPO_LIST}\""  >> /var/local/redmine/scripts/update-repositories-env.sh
+echo "export GIT_SYNC_REDMINE_URL=\"${GIT_SYNC_REDMINE_URL}\""  >> /var/local/redmine/scripts/update-repositories-env.sh
 
 # Start cron in background
 /usr/sbin/cron
