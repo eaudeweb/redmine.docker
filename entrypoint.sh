@@ -2,8 +2,7 @@
 
 # Generated environment for CRON jobs
 /usr/bin/printenv | sed 's/^\(.*\)$/export \1/g' | grep -E "^export TZ|RECEIVE_IMAP" > /var/local/redmine/scripts/env_receive_imap.sh
-echo "export TZ=\"${TZ}\""  >> /var/local/redmine/scripts/env_update_repositories.sh
-echo "export REDMINE_API_KEY=\"${REDMINE_API_KEY}\""  >> /var/local/redmine/scripts/env_update_repositories.sh
+/usr/bin/printenv | sed 's/^\(.*\)$/export \1/g' | grep -E "^export TZ|REDMINE_API_KEY" > /var/local/redmine/scripts/env_update_repositories.sh
 
 # Start cron in background
 /usr/sbin/cron
