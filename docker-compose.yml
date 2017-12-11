@@ -8,7 +8,7 @@ services:
     volumes:
       - redmine-files:/usr/src/redmine/files
       - redmine-tmp:/usr/src/redmine/tmp
-      - redmine-github:/var/local/redmine/github/
+      - redmine-repositories:/var/local/redmine/repositories/
       - redmine-backup:/var/local/redmine/backup/
       - redmine-logs:/usr/src/redmine/log/
     depends_on:
@@ -49,6 +49,5 @@ volumes:
   redmine-logs:
   redmine-backup:
   redmine-tmp:
-  redmine-github:
+  redmine-repositories:
   mysql-data:
-  

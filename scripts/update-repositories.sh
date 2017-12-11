@@ -1,8 +1,8 @@
 #!/bin/sh
 
-REPO_BASEDIR="${GIT_SYNC_FOLDER}"
-REPO_LIST="${GIT_SYNC_REPO_LIST}"
-REDMINE_URL="${GIT_SYNC_REDMINE_URL}"
+# External variables
+# - REDMINE_API_KEY
+GIT_SYNC_FOLDER="/var/local/redmine/repositories"
 
 RESET='\033[0m'
 ERROR='\033[0;31m'
@@ -11,57 +11,37 @@ INFO='\033[0;32m'
 
 # Check script can run safely
 prerequisites() {
-	if [ -z "${REPO_BASEDIR}" ]; then
-        echo -e "${ERROR}REPO_BASEDIR environment variable is missing (set checkout base path), failing ...${RESET}"
-        exit 1	
-	fi
-
-	if [ -z "${REPO_LIST}" ]; then
-        echo -e "${ERROR}REPO_LIST environment variable is missing (add list of repos separated by a single space), failing ...${RESET}"
-        exit 1	
-	fi
-
 	git=`command -v git`
 	if [ -z "$git" ]; then
-        echo -e "${ERROR}Command 'git' is missing, failing ...${RESET}"
-        exit 1
-	fi
-
-	if [ ! -d ${REPO_BASEDIR} ]; then
-		echo -e "${WARN}Creating repositories base directory ${REPO_BASEDIR} ...${RESET}"
-		mkdir -p "${REPO_BASEDIR}"
-	fi
-
-	if [ ! -d ${REPO_BASEDIR} ]; then
-		echo -e "${ERROR}Cannot find repositories storage ${REPO_BASEDIR} ...${RESET}"
+		echo -e "${ERROR}Command 'git' is missing, failing ...${RESET}"
 		exit 1
 	fi
 
-	echo 
+	if [ -z "${REDMINE_API_KEY}" ]; then
+		echo -e "${ERROR}REDMINE_API_KEY environment variable is missing, ignoring ...${RESET}"
+		exit 0
+	fi
+
+	if [ ! -d ${GIT_SYNC_FOLDER} ]; then
+		echo -e "${ERROR}Cannot find repositories storage ${GIT_SYNC_FOLDER}, ignoring ...${RESET}"
+		exit 0
+	fi
 }
 
 redmine_update() {
-	curl -q "${REDMINE_URL}"
+	curl -q "http://localhost:3000/sys/fetch_changesets?key=${REDMINE_API_KEY}"
 }
 
 # Clone repositories
-clone_or_update() {
-
-	for repo in ${REPO_LIST}
+update_repositories() {
+	for REPO_DIR in ${GIT_SYNC_FOLDER}/*
 	do
-		DIRNAME=`basename ${repo}`
-		REPO_DESTDIR="${REPO_BASEDIR}${DIRNAME}.git"
-		if [ ! -d ${REPO_DESTDIR} ]
-		then
-			echo -e "${INFO}Cloning ${repo} to ${REPO_DESTDIR}${RESET}"
-			git clone -q --mirror ${repo} ${REPO_DESTDIR}
-		else
-			echo -e "${INFO}Updating ${REPO_DESTDIR}${RESET}"
-			cd ${REPO_DESTDIR} && git fetch -q --all
+		if [ -d ${REPO_DIR} ]; then
+			cd ${REPO_DIR} && git fetch -q --all
 		fi
 	done
 }
 
 prerequisites;
-clone_or_update;
+update_repositories;
 redmine_update;
