@@ -44,10 +44,10 @@ To track changes from remote repositories, enter the redmine repository and clon
 ```
 #> docker exec -ti redmine bash
 #> cd /var/local/redmine/repositories
-#> git clone https://github.com/account/repo.git
+#> git clone --mirror https://github.com/account/repo.git
 ```
 
-A cron task will update the repository twice a day.
+A cron task will update the repository every 15 minutes.
 
 ### Local development and testing
 
