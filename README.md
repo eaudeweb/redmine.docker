@@ -25,10 +25,6 @@ Start redmine
 
     docker-compose up -d
 
-For local development
-
-    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-
 Initial configuration
 
 - Login using admin/admin and change password for admin user
@@ -40,6 +36,25 @@ Initial configuration
 - Configure trackers and workflows
 - Add users
 - etc.
+
+## Adding support for repositories
+
+To track changes from remote repositories, enter the redmine repository and clone them locally, for instance:
+
+```
+#> docker exec -ti redmine bash
+#> cd /var/local/redmine/repositories
+#> git clone --mirror https://github.com/account/repo.git
+```
+
+A cron task will update the repository every 15 minutes.
+
+### Local development and testing
+
+If you want to test changes locally:
+
+1. build a custom image locally `docker build -t eaudeweb/redmine-local .`
+1. Copy `docker-compose.dev.yml` to `docker-compose.override.yml` to include the local image.
 
 [![Docker](https://dockerbuildbadges.quelltext.eu/status.svg?organization=eaudeweb&repository=redmine)](https://hub.docker.com/r/eaudeweb/redmine/builds)
 

@@ -1,2 +1,2 @@
-*/5 * * * * . /var/local/redmine/scripts/receive_imap_env.sh; /var/local/redmine/scripts/receive_imap.sh
-0 6 * * * . /var/local/redmine/scripts/redmine_github_sync_env.sh; /var/local/redmine/scripts/redmine_github_sync.sh
+*/5 * * * * . /var/local/redmine/scripts/env_receive_imap.sh; /var/local/redmine/scripts/receive_imap.sh
+*/15 * * * * . /var/local/redmine/scripts/env_update_repositories.sh; /var/local/redmine/scripts/update-repositories.sh

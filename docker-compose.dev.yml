@@ -3,10 +3,10 @@ version: '2.0'
 services:
 
   redmine:
+    image: eaudeweb/redmine-local
     container_name: redmine
     ports:
       - 8090:3000
 
   mysql:
     container_name: redmine_mysql
-
