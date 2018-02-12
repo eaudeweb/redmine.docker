@@ -27,6 +27,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/paginagmbh/redmine_silencer.git \
  && git clone https://github.com/paginagmbh/redmine_lightbox2.git \
  && git clone https://github.com/rgtk/redmine_impersonate.git \
+ && git clone https://github.com/rgtk/redmine_editauthor.git \
  && cd ${REDMINE_PATH} \
  && gem install bundler --pre \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
