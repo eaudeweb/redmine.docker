@@ -20,8 +20,8 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && mkdir -p ${REDMINE_LOCAL_PATH}/backup \
  && cd ${REDMINE_PATH}/plugins \
  && git clone --branch v2.2.0 https://github.com/koppen/redmine_github_hook.git \
- && git clone https://github.com/Ilogeek/redmine_issue_dynamic_edit.git \
 # && git clone --branch 1.0.9 https://framagit.org/infopiiaf/redhopper.git \
+# && git clone https://github.com/Ilogeek/redmine_issue_dynamic_edit.git \
  && git clone https://github.com/foton/redmine_watcher_groups.git \
  && git clone https://github.com/akiko-pusu/redmine_banner.git \
  && git clone https://github.com/paginagmbh/redmine_silencer.git \
@@ -42,9 +42,11 @@ COPY redmine.crontab ${REDMINE_LOCAL_PATH}/
 
 WORKDIR $REDMINE_PATH
 ADD http://www.redmine.org/attachments/download/18944/allow_watchers_and_contributers_access_to_issues_3.4.2.patch \
-	patches/imap_scan_multiple_folders.patch \
-	${REDMINE_PATH}/
+    http://www.redmine.org/attachments/download/20075/redmine_3_4_log_time_for_others.patch \
+    patches/imap_scan_multiple_folders.patch \
+    ${REDMINE_PATH}/
 RUN patch -p0 < allow_watchers_and_contributers_access_to_issues_3.4.2.patch \
+  && patch -p0 < redmine_3_4_log_time_for_others.patch \
   && patch -p0 < imap_scan_multiple_folders.patch
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]

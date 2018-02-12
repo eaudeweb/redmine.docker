@@ -3,7 +3,7 @@ version: '2.0'
 services:
 
   redmine:
-    image: eaudeweb/redmine-local
+    build: .
     container_name: redmine
     ports:
       - 8090:3000
