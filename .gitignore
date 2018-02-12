@@ -1,2 +1,2 @@
-.redmine.secret
+.env
 docker-compose.override.yml

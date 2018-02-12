@@ -7,7 +7,7 @@
 # Start cron in background
 /usr/sbin/cron
 
-crontab -u root /var/local/redmine/redmine.crontab
+crontab -u root /var/local/redmine/crontab
 
 while ! nc -z mysql 3306; do
     echo "Waiting for mysql server mysql:3306 ..."
