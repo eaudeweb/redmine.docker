@@ -14,10 +14,10 @@ services:
     depends_on:
       - mysql
     environment:
-      TZ: "Europe/Bucharest"
+      TZ: "${TZ}"
       REDMINE_PLUGINS_MIGRATE: "true"
     env_file:
-      - .redmine.secret
+      - .env
 
   mysql:
     image: mysql:5.5
@@ -26,9 +26,9 @@ services:
     - mysql-data:/var/lib/mysql
     - redmine-backup:/var/local/backup/
     environment:
-      TZ: "Europe/Bucharest"
+      TZ: "${TZ}"
     env_file:
-      - .redmine.secret
+      - .env
     command:
     - "--character-set-server=utf8"
     - "--collation-server=utf8_unicode_ci"

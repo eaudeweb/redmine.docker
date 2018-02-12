@@ -38,7 +38,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && unzip -d ${REDMINE_PATH}/public/themes -o ${REDMINE_LOCAL_PATH}/plugins/informea-theme.zip
 
 COPY entrypoint.sh scripts/receive_imap.sh scripts/update-repositories.sh scripts/update_configuration.py ${REDMINE_LOCAL_PATH}/scripts/
-COPY redmine.crontab ${REDMINE_LOCAL_PATH}/
+COPY crontab ${REDMINE_LOCAL_PATH}/
 
 WORKDIR $REDMINE_PATH
 ADD http://www.redmine.org/attachments/download/18944/allow_watchers_and_contributers_access_to_issues_3.4.2.patch \
