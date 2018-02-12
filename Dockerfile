@@ -34,7 +34,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && cd ${REDMINE_PATH} \
  && gem install bundler --pre \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
- && unzip -d ${REDMINE_PATH}/public/themes -o ${REDMINE_LOCAL_PATH}/plugins/PurpleMine2-custom.zip \
+ && unzip -d ${REDMINE_PATH}/public/themes -o ${REDMINE_LOCAL_PATH}/plugins/edw-theme.zip \
  && unzip -d ${REDMINE_PATH}/public/themes -o ${REDMINE_LOCAL_PATH}/plugins/informea-theme.zip
 
 COPY entrypoint.sh scripts/receive_imap.sh scripts/update-repositories.sh scripts/update_configuration.py ${REDMINE_LOCAL_PATH}/scripts/
