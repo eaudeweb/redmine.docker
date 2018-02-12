@@ -56,6 +56,16 @@ If you want to test changes locally:
 1. build a custom image locally `docker build -t eaudeweb/redmine-local .`
 1. Copy `docker-compose.dev.yml` to `docker-compose.override.yml` to include the local image.
 
+
+#### To reset your password
+
+Enter MySQL container
+
+```
+docker exec -ti redmine_mysql mysql -ps3cr3t redmine -e "UPDATE users SET auth_source_id = NULL WHERE id = XX"
+```
+
+
 [![Docker](https://dockerbuildbadges.quelltext.eu/status.svg?organization=eaudeweb&repository=redmine)](https://hub.docker.com/r/eaudeweb/redmine/builds)
 
 2017
