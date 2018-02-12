@@ -1,4 +1,4 @@
-FROM redmine:3.4.2
+FROM redmine:3.4.4
 LABEL maintainer="<informea@eaudeweb.ro>"
 
 
