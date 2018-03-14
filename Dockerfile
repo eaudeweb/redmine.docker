@@ -31,6 +31,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/GEROMAX/redmine_subtask_list_accordion.git \
  && git clone https://github.com/RCRM/redmine_checklists.git \
  && git clone https://github.com/RCRM/redmine_agile.git \
+ && git clone https://github.com/RCRM/redmine_people.git \
  && cd ${REDMINE_PATH} \
  && gem install bundler --pre \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
