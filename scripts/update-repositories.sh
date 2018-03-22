@@ -37,7 +37,7 @@ update_repositories() {
 	for REPO_DIR in ${GIT_SYNC_FOLDER}/*
 	do
 		if [ -d ${REPO_DIR} ]; then
-			cd ${REPO_DIR} && git fetch -q --all
+			cd ${REPO_DIR} && git fetch -q origin +refs/heads/*:refs/heads/* && git reset --soft
 		fi
 	done
 }
