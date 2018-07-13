@@ -1,4 +1,4 @@
-FROM redmine:3.4.4
+FROM redmine:3.4.6
 LABEL maintainer="<informea@eaudeweb.ro>"
 
 
@@ -11,6 +11,7 @@ RUN apt-get update -q \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && pip3 install --upgrade setuptools \
+ && pip3 install wheel \
  && pip3 install PyYAML ruamel.yaml
 
 COPY plugins/* ${REDMINE_LOCAL_PATH}/plugins/
@@ -29,9 +30,12 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/rgtk/redmine_impersonate.git \
  && git clone https://github.com/rgtk/redmine_editauthor.git \
  && git clone https://github.com/GEROMAX/redmine_subtask_list_accordion.git \
- && git clone https://github.com/RCRM/redmine_checklists.git \
- && git clone https://github.com/RCRM/redmine_agile.git \
- && git clone https://github.com/RCRM/redmine_people.git \
+ #&& git clone https://github.com/RCRM/redmine_checklists.git \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_11-light.zip \
+ #&& git clone https://github.com/RCRM/redmine_agile.git \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_4_6-light.zip \
+ #&& git clone https://github.com/RCRM/redmine_people.git \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_3_2-light.zip \
  && cd ${REDMINE_PATH} \
  && gem install bundler --pre \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
@@ -42,12 +46,14 @@ COPY entrypoint.sh scripts/receive_imap.sh scripts/update-repositories.sh script
 COPY crontab ${REDMINE_LOCAL_PATH}/
 
 WORKDIR $REDMINE_PATH
+# https://www.redmine.org/attachments/download/20934/0001-Allow-the-current-user-to-log-time-for-other-users.patch
 ADD http://www.redmine.org/attachments/download/18944/allow_watchers_and_contributers_access_to_issues_3.4.2.patch \
-    http://www.redmine.org/attachments/download/20075/redmine_3_4_log_time_for_others.patch \
+    patches/redmine_3_6_log_time_for_others.patch \
     patches/imap_scan_multiple_folders.patch \
     ${REDMINE_PATH}/
+
 RUN patch -p0 < allow_watchers_and_contributers_access_to_issues_3.4.2.patch \
-  && patch -p0 < redmine_3_4_log_time_for_others.patch \
+  && patch -p0 < redmine_3_6_log_time_for_others.patch \
   && patch -p0 < imap_scan_multiple_folders.patch
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]

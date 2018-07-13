@@ -1,6 +1,6 @@
 --- lib/redmine/imap.rb	2017-07-16 21:18:26.000000000 +0300
-+++ lib/redmine/imap.rb	2017-09-22 17:10:21.317129500 +0300
-@@ -32,22 +32,26 @@
++++ lib/redmine/imap.rb	2018-07-13 18:46:33.480577200 +0300
+@@ -32,26 +32,37 @@
            imap.starttls
          end
          imap.login(imap_options[:username], imap_options[:password]) unless imap_options[:username].nil?
@@ -22,24 +22,36 @@
 -              imap.uid_store(uid, "+FLAGS", [:Deleted])
 +        folders = folder.split(',')
 +        folders.each do |folder|
-+          logger.debug "Reading folder #{folder}"
 +          imap.select(folder)
++
++          imap.uid_search(['ALL']).each do |uid|
++            flags = imap.uid_fetch(uid, ['FLAGS'])[0].attr['FLAGS']
++            envelope = imap.uid_fetch(uid,'ENVELOPE')[0].attr['ENVELOPE']
++            from = envelope.from[0].mailbox + "@" + envelope.from[0].host
++            logger.info "Found in #{folder} message #{uid} from #{from}, flags: #{flags}"
++          end
++
 +          imap.uid_search(['NOT', 'SEEN']).each do |uid|
 +            msg = imap.uid_fetch(uid,'RFC822')[0].attr['RFC822']
-+            logger.debug "Receiving message #{uid}" if logger && logger.debug?
++            logger.info "Processing message #{uid}" if logger && logger.info?
 +            if MailHandler.safe_receive(msg, options)
-+              logger.debug "Message #{uid} successfully received" if logger && logger.debug?
++              logger.info "Message #{uid} successfully received" if logger && logger.info?
 +              if imap_options[:move_on_success]
 +                imap.uid_copy(uid, imap_options[:move_on_success])
 +              end
 +              imap.uid_store(uid, "+FLAGS", [:Seen, :Deleted])
 +            else
-+              logger.debug "Message #{uid} can not be processed" if logger && logger.debug?
-+              imap.uid_store(uid, "+FLAGS", [:Seen])
++              logger.error "Message #{uid} can not be processed" if logger && logger.error?
++              imap.uid_store(uid, "-FLAGS", [:Seen])
 +              if imap_options[:move_on_failure]
 +                imap.uid_copy(uid, imap_options[:move_on_failure])
 +                imap.uid_store(uid, "+FLAGS", [:Deleted])
 +              end
              end
            end
++          imap.expunge
          end
+-        imap.expunge
+         imap.logout
+         imap.disconnect
+       end

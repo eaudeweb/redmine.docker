@@ -14,4 +14,4 @@ export BUNDLE_PATH=/usr/local/bundle
 	folder=${RECEIVE_IMAP_FOLDERS} project_from_subaddress=${RECEIVE_IMAP_USERNAME}
 	allow_override=project,tracker,status,priority \
 	unknown_user=create no_permission_check=1 \
-	move_on_success=DONE
+	move_on_success=DONE move_on_failure=ERRORS
