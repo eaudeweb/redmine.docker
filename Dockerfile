@@ -34,6 +34,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_11-light.zip \
  #&& git clone https://github.com/RCRM/redmine_agile.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_4_6-light.zip \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/EasyGanttFree.zip \
  #&& git clone https://github.com/RCRM/redmine_people.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_3_2-light.zip \
  && cd ${REDMINE_PATH} \
