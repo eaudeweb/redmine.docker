@@ -44,6 +44,18 @@ services:
     - "--max-heap-table-size=384M"
     - "--join-buffer-size=256M"
 
+  smtp:
+    image: eeacms/postfix
+    restart: always
+    hostname: helpdesk.eaudeweb.ro
+    environment:
+    - MTP_HOST=${MTP_HOST}
+    - MTP_RELAY=${MTP_RELAY}
+    - MTP_PORT=${MTP_PORT}
+    - MTP_USER=${MTP_USER}
+    - MTP_PASS=${MTP_PASS}
+    - MTP_DESTINATION=${MTP_DESTINATION}
+
 volumes:
   redmine-files:
   redmine-logs:
