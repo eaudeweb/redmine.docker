@@ -17,8 +17,8 @@ Clone the repository
 
 Edit the secrets
 
-    cp .redmine.secret.example .redmine.secret
-    vim .redmine.secret
+    cp .env.example .env
+    vim .env
 
 
 Start redmine
