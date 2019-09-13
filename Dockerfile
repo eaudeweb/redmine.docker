@@ -32,6 +32,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/GEROMAX/redmine_subtask_list_accordion.git \
  #&& git clone https://github.com/RCRM/redmine_checklists.git \
  && git clone https://github.com/laoshancun/redmine_checklists.git \
+ && git clone https://github.com/two-pack/redmine_xlsx_format_issue_exporter.git \
 #  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_16-light.zip \
  #&& git clone https://github.com/RCRM/redmine_agile.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_4_12-light.zip \
