@@ -51,14 +51,17 @@ COPY crontab ${REDMINE_LOCAL_PATH}/
 WORKDIR $REDMINE_PATH
 # OLD PATCH https://www.redmine.org/attachments/download/20934/0001-Allow-the-current-user-to-log-time-for-other-users.patch
 # NEW PATCH https://www.redmine.org/attachments/download/22481/allow_watchers_and_contributers_access_to_issues_4.0.2.patch
+# See also https://www.redmine.org/attachments/download/7349/subprojects_query_filter_fix.patch
 ADD https://www.redmine.org/attachments/download/22481/allow_watchers_and_contributers_access_to_issues_4.0.2.patch \
     patches/redmine_3_6_log_time_for_others.patch \
     patches/imap_scan_multiple_folders.patch \
+    patches/subprojects_query_filter_fix.patch \
     ${REDMINE_PATH}/
 
 RUN patch -p0 < allow_watchers_and_contributers_access_to_issues_4.0.2.patch \
   && patch -p0 < redmine_3_6_log_time_for_others.patch \
-  && patch -p0 < imap_scan_multiple_folders.patch
+  && patch -p0 < imap_scan_multiple_folders.patch \
+  && patch -p0 < subprojects_query_filter_fix.patch
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]
 CMD []

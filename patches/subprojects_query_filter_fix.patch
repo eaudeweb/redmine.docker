@@ -1,0 +1,13 @@
+--- app/models/query.rb.orig	2020-02-27 11:28:42.993637741 +0200
++++ app/models/query.rb	2020-02-27 11:30:16.861421770 +0200
+@@ -811,8 +811,8 @@
+       if has_filter?("subproject_id")
+         case operator_for("subproject_id")
+         when '='
+-          # include the selected subprojects
+-          ids = [project.id] + values_for("subproject_id").map(&:to_i)
++          # include the selected subprojects, but not the parent project
++          ids = values_for("subproject_id").map(&:to_i)
+           project_clauses << "#{Project.table_name}.id IN (%s)" % ids.join(',')
+         when '!'
+           # exclude the selected subprojects
