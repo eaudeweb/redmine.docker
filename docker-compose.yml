@@ -4,7 +4,7 @@ services:
 
   redmine:
     image: eaudeweb/redmine
-    restart: always
+    restart: unless-stopped
     volumes:
       - redmine-files:/usr/src/redmine/files
       - redmine-tmp:/usr/src/redmine/tmp
@@ -21,7 +21,7 @@ services:
 
   mysql:
     image: mysql:5.5
-    restart: always
+    restart: unless-stopped
     volumes:
     - mysql-data:/var/lib/mysql
     - redmine-backup:/var/local/backup/
@@ -46,7 +46,7 @@ services:
 
   smtp:
     image: eeacms/postfix
-    restart: always
+    restart: unless-stopped
     hostname: helpdesk.eaudeweb.ro
     environment:
     - MTP_HOST=${MTP_HOST}
