@@ -43,12 +43,14 @@ COPY crontab ${REDMINE_LOCAL_PATH}/
 WORKDIR $REDMINE_PATH
 
 ADD patches/allow_watchers_and_contributers_access_to_issues_4.2.2.patch \
-    patches/redmine_3_6_log_time_for_others.patch \
     patches/imap_scan_multiple_folders.patch \
+    patches/subprojects_query_filter_fix.patch \
     ${REDMINE_PATH}/
 
 RUN patch -p1 < allow_watchers_and_contributers_access_to_issues_4.2.2.patch \
-  && patch -p0 < imap_scan_multiple_folders.patch
+  && patch -p0 < imap_scan_multiple_folders.patch \
+  && patch -p0 < subprojects_query_filter_fix.patch
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]
+
 CMD []

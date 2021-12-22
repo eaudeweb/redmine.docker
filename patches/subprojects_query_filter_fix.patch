@@ -1,57 +1,13 @@
-diff --git app/models/query.rb app/models/query.rb
-index f3b83d0..f61e9ce 100644
---- app/models/query.rb
-+++ app/models/query.rb
-@@ -469,8 +469,8 @@ class Query < ActiveRecord::Base
+--- app/models/query.rb.orig	2020-02-27 11:28:42.993637741 +0200
++++ app/models/query.rb	2020-02-27 11:30:16.861421770 +0200
+@@ -811,8 +811,8 @@
        if has_filter?("subproject_id")
          case operator_for("subproject_id")
          when '='
 -          # include the selected subprojects
--          ids += values_for("subproject_id").each(&:to_i)
-+          # include the selected subprojects, but not the parent project.
-+          ids = values_for("subproject_id").each(&:to_i)
-         when '!*'
-           # main project only
-         else
-diff --git config/locales/de.yml config/locales/de.yml
-index ea60e80..48bc15f 100644
---- config/locales/de.yml
-+++ config/locales/de.yml
-@@ -293,7 +293,7 @@ de:
-   field_comments: Kommentar
-   field_url: URL
-   field_start_page: Hauptseite
--  field_subproject: Unterprojekt von
-+  field_subproject: Unterprojekt
-   field_hours: Stunden
-   field_activity: Aktivität
-   field_spent_on: Datum
-diff --git test/unit/query_test.rb test/unit/query_test.rb
-index e3f3c92..c004acb 100644
---- test/unit/query_test.rb
-+++ test/unit/query_test.rb
-@@ -62,6 +62,24 @@ class QueryTest < ActiveSupport::TestCase
-   def assert_query_statement_includes(query, condition)
-     assert query.statement.include?(condition), "Query statement condition not found in: #{query.statement}"
-   end
-+
-+  def test_filter_subproject_should_not_include_parent_issues
-+    User.current = User.find(1)
-+    project = Project.find(1)
-+    assert project.issues.any?
-+    subproject = project.children.find(3)
-+    assert subproject.issues.any?
-+    query = Query.new(:name => '_',
-+                      :project => project,
-+                      :filters => { 'subproject_id' => {:operator => '=', :values => [3]}})
-+    result = find_issues_with_query(query)
-+    assert_not_nil result
-+    assert_equal subproject.issues.size, result.size
-+    result.each do |issue|
-+      assert_equal 3, issue.project_id
-+    end
-+    User.current = nil
-+  end
-   
-   def assert_query_result(expected, query)
-     assert_nothing_raised do
+-          ids = [project.id] + values_for("subproject_id").map(&:to_i)
++          # include the selected subprojects, but not the parent project
++          ids = values_for("subproject_id").map(&:to_i)
+           project_clauses << "#{Project.table_name}.id IN (%s)" % ids.join(',')
+         when '!'
+           # exclude the selected subprojects
