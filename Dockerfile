@@ -1,5 +1,5 @@
 FROM redmine:4.2.3-bullseye
-LABEL maintainer="<informea@eaudeweb.ro>"
+LABEL maintainer="<noc@eaudeweb.ro>"
 
 
 ENV REDMINE_PATH=/usr/src/redmine \
