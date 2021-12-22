@@ -15,6 +15,11 @@ done
 
 /var/local/redmine/scripts/update_configuration.py
 
+
+# Needed to fix some permission issues caused by installing gems with root user
+mkdir -p /home/redmine/.bundle/cache/compact_index
+chown redmine.redmine -R /home/redmine
+
 gem install bundler --pre
 gem install activesupport
 

@@ -4,7 +4,7 @@ services:
 
   redmine:
     image: eaudeweb/redmine
-    restart: always
+    restart: unless-stopped
     volumes:
       - redmine-files:/usr/src/redmine/files
       - redmine-tmp:/usr/src/redmine/tmp
@@ -21,7 +21,7 @@ services:
 
   mysql:
     image: mysql:5.5
-    restart: always
+    restart: unless-stopped
     volumes:
     - mysql-data:/var/lib/mysql
     - redmine-backup:/var/local/backup/
@@ -43,6 +43,18 @@ services:
     - "--tmp-table-size=384M"
     - "--max-heap-table-size=384M"
     - "--join-buffer-size=256M"
+
+  smtp:
+    image: eeacms/postfix
+    restart: unless-stopped
+    hostname: helpdesk.eaudeweb.ro
+    environment:
+    - MTP_HOST=${MTP_HOST}
+    - MTP_RELAY=${MTP_RELAY}
+    - MTP_PORT=${MTP_PORT}
+    - MTP_USER=${MTP_USER}
+    - MTP_PASS=${MTP_PASS}
+    - MTP_DESTINATION=${MTP_DESTINATION}
 
 volumes:
   redmine-files:
