@@ -22,7 +22,10 @@ mkdir -p /home/redmine/.bundle/cache/compact_index
 chown redmine.redmine -R /home/redmine
 
 gem install bundler --pre
+gem install activesupport
 
 bundle install
 
 /docker-entrypoint.sh rails server -b 0.0.0.0
+
+sleep 4800
