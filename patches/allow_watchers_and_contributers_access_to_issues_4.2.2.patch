@@ -1,0 +1,168 @@
+commit 8d7c3d36cb0044bb66507a1c58e53d290370a9ba
+Author: Jobin Joseph <jobin@nixhive.com>
+Date:   Sun Sep 26 00:45:27 2021 +0300
+
+    allow_watchers_and_contributers_access_to_issues_4.2.2
+
+diff --git a/app/models/issue.rb b/app/models/issue.rb
+index 7ce04ad64..62a660a3c 100644
+--- a/app/models/issue.rb
++++ b/app/models/issue.rb
+@@ -135,6 +135,12 @@ class Issue < ActiveRecord::Base
+             "(#{table_name}.is_private = #{connection.quoted_false} " \
+               "OR #{table_name}.author_id = #{user.id} " \
+               "OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}))"
++          when 'own_watch'
++            user_ids = [user.id] + user.groups.pluck(:id)
++            "(#{table_name}.author_id = #{user.id} OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}) OR #{table_name}.id IN (SELECT watchable_id FROM watchers WHERE user_id=#{user.id} AND watchable_type = 'Issue'))"
++          when 'own_watch_contributed'
++            user_ids = [user.id] + user.groups.pluck(:id)
++          "(#{table_name}.author_id = #{user.id} OR #{table_name}.assigned_to_id IN (#{user_ids.join(',')}) OR #{table_name}.id IN (SELECT watchable_id FROM watchers WHERE user_id=#{user.id} AND watchable_type = 'Issue') OR #{table_name}.id IN (SELECT journalized_id FROM journals where journalized_type = 'Issue' AND user_id=#{user.id} GROUP BY journalized_id))"
+           when 'own'
+             user_ids = [user.id] + user.groups.pluck(:id).compact
+             "(#{table_name}.author_id = #{user.id} OR " \
+@@ -169,6 +175,10 @@ class Issue < ActiveRecord::Base
+             !self.is_private? || (self.author == user || user.is_or_belongs_to?(assigned_to))
+           when 'own'
+             self.author == user || user.is_or_belongs_to?(assigned_to)
++          when 'own_watch'
++            self.author == user || user.is_or_belongs_to?(assigned_to) || self.watched_by?(user)
++          when 'own_watch_contributed'
++            self.author == user || user.is_or_belongs_to?(assigned_to) || self.watched_by?(user) || self.journals.where('journalized_id = ?', self.id).where('user_id = ?', user).count > 0
+           else
+             false
+           end
+diff --git a/app/models/role.rb b/app/models/role.rb
+index ee1a664e6..ec74e49cc 100644
+--- a/app/models/role.rb
++++ b/app/models/role.rb
+@@ -40,7 +40,9 @@ class Role < ActiveRecord::Base
+   ISSUES_VISIBILITY_OPTIONS = [
+     ['all', :label_issues_visibility_all],
+     ['default', :label_issues_visibility_public],
+-    ['own', :label_issues_visibility_own]
++    ['own', :label_issues_visibility_own],
++    ['own_watch', :label_issues_visibility_own_watch],
++    ['own_watch_contributed', :label_issues_visibility_own_watch_contributed]
+   ]
+ 
+   TIME_ENTRIES_VISIBILITY_OPTIONS = [
+diff --git a/config/locales/en.yml b/config/locales/en.yml
+index 952138bf4..22c2c8640 100644
+--- a/config/locales/en.yml
++++ b/config/locales/en.yml
+@@ -501,6 +501,7 @@ en:
+   setting_new_item_menu_tab: Project menu tab for creating new objects
+   setting_commit_logs_formatting: Apply text formatting to commit messages
+   setting_timelog_required_fields: Required fields for time logs
++  setting_enable_watcher_issue_visibility: Enable watcher issue visibility
+   setting_close_duplicate_issues: Close duplicate issues automatically
+   setting_time_entry_list_defaults: Timelog list defaults
+   setting_timelog_accept_0_hours: Accept time logs with 0 hours
+@@ -1121,7 +1122,8 @@ en:
+   label_display_type_board: Board
+   label_my_bookmarks: My bookmarks
+   label_assign_to_me: Assign to me
+-
++  label_issues_visibility_own_watch: Issues created by, assigned to, or watched by the user
++  label_issues_visibility_own_watch_contributed: Issues created by, assigned to, watched by, or contributed to by the user
+   button_login: Login
+   button_submit: Submit
+   button_save: Save
+diff --git a/test/unit/issue_test.rb b/test/unit/issue_test.rb
+index e298f4d68..4127a10a1 100644
+--- a/test/unit/issue_test.rb
++++ b/test/unit/issue_test.rb
+@@ -292,6 +292,39 @@ class IssueTest < ActiveSupport::TestCase
+     assert_visibility_match user, issues
+   end
+ 
++  def test_visible_scope_for_non_member_with_own_watch_issues_visibility
++    #Role.non_member.add_permission! :view_issues
++    Role.non_member.update! :issues_visibility, 'own_watch'
++    user = User.find(9)
++    assert user.projects.empty?
++    own_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => user.id, :subject => 'Issue by non member')
++    watching_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue watched by non member')
++    watching_issue.add_watcher(user)
++
++    #assert_equal true, own_issue.visible?(user)
++    #assert_equal true, watching_issue.visible?(user)
++    assert_visibility_match user, [own_issue, watching_issue]
++  end
++
++  def test_visible_scope_for_non_member_with_own_watch_contributed_issues_visibility
++    #Role.non_member.add_permission! :view_issues
++    Role.non_member.update! :issues_visibility, 'own_watch_contributed'
++    user = User.find(9)
++    assert user.projects.empty?
++    own_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => user.id, :subject => 'Issue by non member')
++    watching_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue watched by non member')
++    watching_issue.add_watcher(user)
++    watching_issue.reload
++    contributed_issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue contributed by non member')
++    journal = contributed_issue.init_journal(user)
++    journal.notes = 'journal notes'
++    journal.save!
++
++    #assert_equal true, own_issue.visible?(user)
++    #assert_equal true, watching_issue.visible?(user)
++    #assert_equal true, contributed_issue.visible?(user)
++    assert_visibility_match user, [own_issue, watching_issue, contributed_issue]
++  end
+   def test_visible_scope_for_non_member_without_view_issues_permissions
+     # Non member user should not see issues without permission
+     Role.non_member.remove_permission!(:view_issues)
+@@ -370,18 +403,45 @@ class IssueTest < ActiveSupport::TestCase
+         :assigned_to => group,
+         :is_private => true)
+ 
+-      Role.find(2).update! :issues_visibility => 'default'
+-      issues = Issue.visible(User.find(8)).to_a
+-      assert issues.any?
+-      assert issues.include?(issue)
++      ['default', 'own', 'own_watch', 'own_watch_contributed'].each do |issue_visibility|
++        Role.find(2).update! :issues_visibility => issue_visibility
++        issues = Issue.visible(User.find(8)).to_a
++        assert issues.any?
++        assert issues.include?(issue)
++      end
++    end
++  end
+ 
+-      Role.find(2).update! :issues_visibility => 'own'
+-      issues = Issue.visible(User.find(8)).to_a
++  def test_visible_scope_for_non_member_and_watcher_should_return_watching_issues
++    user = User.find(9)
++    assert user.projects.empty?
++    Role.non_member.add_permission!(:view_issues)
++
++    issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue visible to watcher', :is_private => true)
++    issue.add_watcher(user)
++
++    ['own_watch', 'own_watch_contributed'].each do |issue_visibility|
++      Role.non_member.update! :issues_visibility => issue_visibility
++      issues = Issue.visible(user).to_a
+       assert issues.any?
+-      assert_include issue, issues
++      assert issues.include?(issue)
+     end
+   end
+ 
++  def test_visible_scope_for_non_member_and_contributer_should_return_contributing_issues
++    user = User.find(9)
++    assert user.projects.empty?
++    Role.non_member.add_permission!(:view_issues)
++
++    issue = Issue.create!(:project_id => 1, :tracker_id => 1, :author_id => 1, :subject => 'Issue visible to watcher', :is_private => true)
++    journal = issue.init_journal(user)
++    journal.notes = 'journal notes'
++    journal.save!
++
++    Role.non_member.update! :issues_visibility, 'own_watch_contributed'
++    issues = Issue.visible(user).to_a
++  end
++
+   def test_visible_scope_for_member_with_limited_tracker_ids
+     role = Role.find(1)
+     role.set_permission_trackers :view_issues, [2]
