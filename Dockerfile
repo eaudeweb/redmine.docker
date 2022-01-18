@@ -31,7 +31,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/mikitex70/redmine_drawio.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_2-light.zip \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_6_1-light.zip \
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redminex-resources-2-0-0-DEMO_UNZIP_ME_FIRST.zip \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redminex-resources-1-2-1-DEMO_UNZIP_ME_FIRST.zip \
  && cd ${REDMINE_PATH} \
  && gem install bundler --pre \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
