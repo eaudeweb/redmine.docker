@@ -29,6 +29,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_20-light.zip \
  && git clone https://github.com/two-pack/redmine_xlsx_format_issue_exporter.git \
  && git clone https://github.com/mikitex70/redmine_drawio.git \
+ && git clone https://github.com/paginagmbh/redmine_lightbox2.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_2-light.zip \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_6_1-light.zip \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redminex-resources-1-2-1-DEMO_UNZIP_ME_FIRST.zip \
