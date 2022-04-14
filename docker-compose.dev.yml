@@ -7,6 +7,9 @@ services:
     container_name: redmine
     ports:
       - 8090:3000
+# For external hosted SQL servers register a static DNS entry
+#    extra_hosts:
+#      - "mysql:192.168.10.5"
 
   mysql:
     container_name: redmine_mysql
