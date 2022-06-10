@@ -1,5 +1,5 @@
-FROM redmine:4.2.3-bullseye
-LABEL maintainer="<noc@eaudeweb.ro>"
+FROM redmine:4.2.6-bullseye
+LABEL maintainer="<helpdesk@eaudeweb.ro>"
 
 
 ENV REDMINE_PATH=/usr/src/redmine \
@@ -24,7 +24,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/paginagmbh/redmine_silencer.git \
  && git clone https://github.com/rgtk/redmine_impersonate.git \
  && git clone https://github.com/rgtk/redmine_editauthor.git \
- && git clone https://github.com/GEROMAX/redmine_subtask_list_accordion.git \
+ # && git clone https://github.com/GEROMAX/redmine_subtask_list_accordion.git \
  && git clone https://github.com/jkraemer/stopwatch.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_20-light.zip \
  && git clone https://github.com/two-pack/redmine_xlsx_format_issue_exporter.git \
@@ -47,10 +47,12 @@ WORKDIR $REDMINE_PATH
 ADD patches/allow_watchers_and_contributers_access_to_issues_4.2.2.patch \
     patches/imap_scan_multiple_folders.patch \
     patches/subprojects_query_filter_fix.patch \
+    patches/more_project_from_receiver_addresses.patch \
     ${REDMINE_PATH}/
 
 RUN patch -p1 < allow_watchers_and_contributers_access_to_issues_4.2.2.patch \
   && patch -p0 < imap_scan_multiple_folders.patch \
+  && patch -p0 < more_project_from_receiver_addresses.patch \
   && patch -p0 < subprojects_query_filter_fix.patch
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]

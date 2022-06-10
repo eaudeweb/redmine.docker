@@ -10,5 +10,5 @@ export BUNDLE_APP_CONFIG=/usr/local/bundle
 	project=${RECEIVE_IMAP_PROJECT} tracker=task status=new priority=normal category=helpdesk \
 	folder=${RECEIVE_IMAP_FOLDERS} project_from_subaddress=${RECEIVE_IMAP_USERNAME} \
 	allow_override=project,tracker,status,priority \
-	unknown_user=create no_permission_check=1 \
+	unknown_user=accept no_permission_check=1 \
 	move_on_success=DONE move_on_failure=ERRORS
