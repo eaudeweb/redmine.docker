@@ -1,6 +1,6 @@
 --- lib/redmine/imap.rb	2017-07-16 21:18:26.000000000 +0300
-+++ lib/redmine/imap.rb	2018-07-13 18:46:33.480577200 +0300
-@@ -32,26 +32,37 @@
++++ lib/redmine/imap.rb 2022-06-10 18:30:06.077880400 +0000
+@@ -34,26 +34,39 @@
            imap.starttls
          end
          imap.login(imap_options[:username], imap_options[:password]) unless imap_options[:username].nil?
@@ -20,6 +20,7 @@
 -            if imap_options[:move_on_failure]
 -              imap.uid_copy(uid, imap_options[:move_on_failure])
 -              imap.uid_store(uid, "+FLAGS", [:Deleted])
++        logger = Logger.new('/usr/src/redmine/log/incoming_emails.log', 10, 1000000)
 +        folders = folder.split(',')
 +        folders.each do |folder|
 +          imap.select(folder)
@@ -28,7 +29,8 @@
 +            flags = imap.uid_fetch(uid, ['FLAGS'])[0].attr['FLAGS']
 +            envelope = imap.uid_fetch(uid,'ENVELOPE')[0].attr['ENVELOPE']
 +            from = envelope.from[0].mailbox + "@" + envelope.from[0].host
-+            logger.info "Found in #{folder} message #{uid} from #{from}, flags: #{flags}"
++            to = envelope.to[0].mailbox + "@" + envelope.to[0].host
++            logger.info "Found in #{folder} message #{uid} from #{from} to #{to}, flags: #{flags}, subject: #{envelope.subject}"
 +          end
 +
 +          imap.uid_search(['NOT', 'SEEN']).each do |uid|

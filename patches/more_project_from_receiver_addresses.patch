@@ -1,0 +1,23 @@
+--- app/models/mail_handler.rb     2022-06-10 20:51:39.118750900 +0300
++++ app/models/mail_handler.rb     2022-06-10 20:43:22.750550700 +0300
+@@ -399,6 +399,20 @@
+             return project
+           end
+         end
++        # Also try {local} as project identifier
++        if project = Project.find_by_identifier(addr.local.to_s)
++          puts "Found project #{project}"
++          return project
++        end
++      end
++    end
++    # Next try the Delivered-To header
++    email.header["Delivered-To"].each do |addr|
++      next if addr.blank?
++      if addr.to_s =~ /\A#{local}\+([^+]+)@#{domain}\z/
++        if project = Project.find_by_identifier($1)
++          return project
++        end
+       end
+     end
+     nil
