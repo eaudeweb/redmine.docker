@@ -24,6 +24,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/paginagmbh/redmine_silencer.git \
  && git clone https://github.com/rgtk/redmine_impersonate.git \
  && git clone https://github.com/rgtk/redmine_editauthor.git \
+ && git clone -b 4.2.x https://github.com/Loriowar/redmine_issues_tree.git \
  # && git clone https://github.com/GEROMAX/redmine_subtask_list_accordion.git \
  && git clone https://github.com/jkraemer/stopwatch.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_20-light.zip \
