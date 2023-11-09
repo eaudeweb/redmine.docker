@@ -1,4 +1,4 @@
-FROM redmine:4.2.6-bullseye
+FROM redmine:4.2.10-bullseye
 LABEL maintainer="<helpdesk@eaudeweb.ro>"
 
 
@@ -12,7 +12,7 @@ RUN apt-get update -q \
  && rm -rf /var/lib/apt/lists/* \
  && pip3 install --upgrade setuptools \
  && pip3 install wheel \
- && pip3 install PyYAML ruamel.yaml
+ && pip3 install PyYAML "ruamel.yaml<0.18.0"
 
 COPY plugins/* ${REDMINE_LOCAL_PATH}/plugins/
 
@@ -26,7 +26,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/rgtk/redmine_editauthor.git \
  && git clone -b 4.2.x https://github.com/Loriowar/redmine_issues_tree.git \
  # && git clone https://github.com/GEROMAX/redmine_subtask_list_accordion.git \
- && git clone https://github.com/jkraemer/stopwatch.git \
+ # && git clone https://github.com/jkraemer/stopwatch.git \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_20-light.zip \
  && git clone https://github.com/two-pack/redmine_xlsx_format_issue_exporter.git \
  && git clone https://github.com/mikitex70/redmine_drawio.git \
