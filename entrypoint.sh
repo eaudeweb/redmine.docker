@@ -9,7 +9,7 @@
 
 crontab -u root /var/local/redmine/crontab
 
-while ! nc -z mysql 3306; do
+while ! nc -z ${REDMINE_DB_MYSQL} 3306; do
     echo "Waiting for mysql server mysql:3306 ..."
     sleep 1
 done

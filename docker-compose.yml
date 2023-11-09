@@ -30,8 +30,8 @@ services:
     env_file:
       - .env
     command:
-    - "--character-set-server=utf8"
-    - "--collation-server=utf8_unicode_ci"
+    - "--character-set-server=utf8mb4"
+    - "--collation-server=utf8mb4_unicode_ci"
     - "--query-cache-size=0"
     - "--query-cache-limit=64M"
     - "--query-cache-type=0"
