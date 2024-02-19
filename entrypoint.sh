@@ -19,13 +19,13 @@ done
 
 # Needed to fix some permission issues caused by installing gems with root user
 mkdir -p /home/redmine/.bundle/cache/compact_index
-chown redmine.redmine -R /home/redmine
+chown redmine:redmine -R /home/redmine
 
-gem install bundler --pre
-gem install activesupport
+#gem install bundler --pre
+#gem install activesupport
 
-bundle install
+#bundle install
 
 /docker-entrypoint.sh rails server -b 0.0.0.0
 
-sleep 4800
+# sleep 4800

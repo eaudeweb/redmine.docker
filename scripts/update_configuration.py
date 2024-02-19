@@ -4,21 +4,22 @@
     Using environment variables
 """
 
-import ruamel.yaml as yaml
+import yaml
 import os
 
-CONFIG_FILE_IN = '/usr/src/redmine/config/configuration.yml.example'
-CONFIG_FILE = '/usr/src/redmine/config/configuration.yml'
+CONFIG_DIR = "/usr/src/redmine/config/"
+CONFIG_FILE_IN = os.path.join(CONFIG_DIR, "configuration.yml.example")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "configuration.yml")
 
 with open(CONFIG_FILE_IN) as f:
-    data = yaml.load(f, Loader=yaml.RoundTripLoader)
+    data = yaml.safe_load(f)
 
-data['default']['email_delivery'] = {
-    'delivery_method': ':smtp',
-    'smtp_settings': {
-        'address': 'smtp',
-        'port': 25,
-    }
+data["default"]["email_delivery"] = {
+    "delivery_method": ":smtp",
+    "smtp_settings": {
+        "address": "smtp",
+        "port": 25,
+    },
 }
-with open(CONFIG_FILE, 'w') as f:
-    yaml.dump(data, f, Dumper=yaml.RoundTripDumper, indent=4)
+with open(CONFIG_FILE, "w") as f:
+    yaml.dump(data, f, indent=4)
