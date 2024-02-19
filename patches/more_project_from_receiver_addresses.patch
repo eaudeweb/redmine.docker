@@ -1,6 +1,25 @@
---- app/models/mail_handler.rb     2022-06-10 20:51:39.118750900 +0300
-+++ app/models/mail_handler.rb     2022-06-10 20:43:22.750550700 +0300
-@@ -399,6 +399,20 @@
+--- app/models/mail_handler.rb  2022-06-10 20:51:39.118750900 +0300
++++ app/models/mail_handler.rb	2024-02-19 19:20:03.000000000 +0200
+@@ -439,6 +439,18 @@
+ 
+     local = Regexp.escape(local)
+ 
++    # Try the Delivered-To header first
++    email.header["Delivered-To"].each do |addr|
++      next if addr.blank?
++      if addr.to_s =~ /\A#{local}\+([^+]+)@#{domain}\z/
++        puts "From Delivered-To: #{$1}"
++        if project = Project.find_by_identifier($1)
++          puts "Found project #{project}"
++          return project
++        end
++      end
++    end
++
+     [:to, :cc, :bcc].each do |field|
+       header = @email[field]
+       next if header.blank? || header.field.blank? || !header.field.respond_to?(:addrs)
+@@ -449,6 +461,11 @@
              return project
            end
          end
@@ -9,15 +28,7 @@
 +          puts "Found project #{project}"
 +          return project
 +        end
-+      end
-+    end
-+    # Next try the Delivered-To header
-+    email.header["Delivered-To"].each do |addr|
-+      next if addr.blank?
-+      if addr.to_s =~ /\A#{local}\+([^+]+)@#{domain}\z/
-+        if project = Project.find_by_identifier($1)
-+          return project
-+        end
        end
      end
      nil
+

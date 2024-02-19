@@ -47,10 +47,9 @@ COPY crontab ${REDMINE_LOCAL_PATH}/
 
 WORKDIR $REDMINE_PATH
 
-ADD patches/allow_watchers_and_contributers_access_to_issues_4.2.2.patch \
-    patches/imap_scan_multiple_folders.patch \
-    patches/subprojects_query_filter_fix.patch \
+ADD patches/imap_scan_multiple_folders.patch \
     patches/more_project_from_receiver_addresses.patch \
+    patches/subprojects_query_filter_fix.patch \
     ${REDMINE_PATH}/
 
 RUN patch -p0 < imap_scan_multiple_folders.patch \
