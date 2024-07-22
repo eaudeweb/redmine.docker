@@ -42,7 +42,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
 
 VOLUME /usr/local/bundle/gems/
 
-COPY entrypoint.sh scripts/receive_imap.sh scripts/update-repositories.sh scripts/update_configuration.py ${REDMINE_LOCAL_PATH}/scripts/
+COPY entrypoint.sh scripts/receive_imap.sh scripts/update-repositories.sh scripts/update_configuration.py scripts/send_reminders.sh ${REDMINE_LOCAL_PATH}/scripts/
 COPY crontab ${REDMINE_LOCAL_PATH}/
 
 WORKDIR $REDMINE_PATH

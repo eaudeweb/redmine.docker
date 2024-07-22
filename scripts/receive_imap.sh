@@ -13,3 +13,6 @@ export BUNDLE_APP_CONFIG=/usr/local/bundle
 	allow_override=project,tracker,status,priority \
 	unknown_user=accept no_permission_check=1 \
 	move_on_success=DONE move_on_failure=ERRORS
+
+# in case of email attachments, new folders are created with owner root
+chown -R redmine:redmine /usr/src/redmine/files
