@@ -11,6 +11,7 @@ services:
       - redmine-repositories:/var/local/redmine/repositories/:Z
       - redmine-backup:/var/local/redmine/backup/
       - redmine-logs:/usr/src/redmine/log/
+      - redmine-gems:/usr/local/bundle
     depends_on:
       - mysql
     environment:
@@ -62,4 +63,5 @@ volumes:
   redmine-backup:
   redmine-tmp:
   redmine-repositories:
+  redmine-gems:
   mysql-data:
