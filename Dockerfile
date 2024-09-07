@@ -30,6 +30,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/mikitex70/redmine_drawio.git \
  && git clone https://github.com/alphanodes/redmine_lightbox \
  && git clone -b 5.1-extended_watchers https://github.com/maxrossello/redmine_extended_watchers.git \
+ && git clone http://github.com:/jperelli/Redmine-Periodic-Task.git periodictask \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_9-light.zip \
  # && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_6_6-light.zip \
  # redmine_people conflicts with redmine_extended_watchers
@@ -40,9 +41,14 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && unzip -d ${REDMINE_PATH}/public/themes -o ${REDMINE_LOCAL_PATH}/plugins/edw-theme.zip
 
 
-VOLUME /usr/local/bundle/gems/
+COPY entrypoint.sh \
+     scripts/receive_imap.sh \
+     scripts/update-repositories.sh \
+     scripts/update_configuration.py \
+     scripts/send_reminders.sh \
+     scripts/check_periodictasks.sh \
+     ${REDMINE_LOCAL_PATH}/scripts/
 
-COPY entrypoint.sh scripts/receive_imap.sh scripts/update-repositories.sh scripts/update_configuration.py scripts/send_reminders.sh ${REDMINE_LOCAL_PATH}/scripts/
 COPY crontab ${REDMINE_LOCAL_PATH}/
 
 WORKDIR $REDMINE_PATH
@@ -58,6 +64,8 @@ RUN patch -p0 < imap_scan_multiple_folders.patch \
 && patch -p0 < more_project_from_receiver_addresses.patch \
 && patch -p0 < subprojects_query_filter_fix.patch \
 && patch -p0 < move_watchers_to_issues_content_area.diff
+
+RUN gosu redmine bundle install
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]
 
