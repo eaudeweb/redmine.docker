@@ -1,0 +1,43 @@
+Index: app/views/issues/show.html.erb
+===================================================================
+--- app/views/issues/show.html.erb	(Revision 17840)
++++ app/views/issues/show.html.erb	(Arbeitskopie)
+@@ -117,6 +117,13 @@
+ <%= render :partial => 'relations' %>
+ </div>
+ <% end %>
++<% if User.current.allowed_to?(:add_issue_watchers, @project) ||
++    (@issue.watchers.present? && User.current.allowed_to?(:view_issue_watchers, @project)) %>
++  <hr />
++  <div id="watchers">
++    <%= render :partial => 'watchers/watchers', :locals => {:watched => @issue} %>
++  </div>
++<% end %>
+ 
+ </div>
+ 
+@@ -148,12 +155,6 @@
+ <% content_for :sidebar do %>
+   <%= render :partial => 'issues/sidebar' %>
+ 
+-  <% if User.current.allowed_to?(:add_issue_watchers, @project) ||
+-    (@issue.watchers.present? && User.current.allowed_to?(:view_issue_watchers, @project)) %>
+-    <div id="watchers">
+-      <%= render :partial => 'watchers/watchers', :locals => {:watched => @issue} %>
+-    </div>
+-  <% end %>
+ <% end %>
+ 
+ <% content_for :header_tags do %>
+Index: app/views/watchers/_watchers.html.erb
+===================================================================
+--- app/views/watchers/_watchers.html.erb	(Revision 17840)
++++ app/views/watchers/_watchers.html.erb	(Arbeitskopie)
+@@ -7,6 +7,6 @@
+ </div>
+ <% end %>
+ 
+-<h3><%= l(:"label_#{watched_klass_name}_watchers") %> (<%= watched.watcher_users.size %>)</h3>
++<p><strong><%= l(:"label_#{watched_klass_name}_watchers") %> (<%= watched.watcher_users.size %>)</strong></p>
+ 
+ <%= watchers_list(watched) %>

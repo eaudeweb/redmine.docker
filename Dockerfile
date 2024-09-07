@@ -1,4 +1,4 @@
-FROM redmine:5.1.1-bookworm
+FROM redmine:5.1.3-bookworm
 LABEL maintainer="<helpdesk@eaudeweb.ro>"
 
 
@@ -30,10 +30,10 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/mikitex70/redmine_drawio.git \
  && git clone https://github.com/alphanodes/redmine_lightbox \
  && git clone -b 5.1-extended_watchers https://github.com/maxrossello/redmine_extended_watchers.git \
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_8-light.zip \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_9-light.zip \
  # && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_6_6-light.zip \
  # redmine_people conflicts with redmine_extended_watchers
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_23-light.zip \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_25-light.zip \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redminex-resources-1-2-1.zip \
  && cd ${REDMINE_PATH} \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
@@ -50,11 +50,14 @@ WORKDIR $REDMINE_PATH
 ADD patches/imap_scan_multiple_folders.patch \
     patches/more_project_from_receiver_addresses.patch \
     patches/subprojects_query_filter_fix.patch \
+    # https://www.redmine.org/issues/29321
+    patches/move_watchers_to_issues_content_area.diff \
     ${REDMINE_PATH}/
 
 RUN patch -p0 < imap_scan_multiple_folders.patch \
 && patch -p0 < more_project_from_receiver_addresses.patch \
-&& patch -p0 < subprojects_query_filter_fix.patch
+&& patch -p0 < subprojects_query_filter_fix.patch \
+&& patch -p0 < move_watchers_to_issues_content_area.diff
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]
 
