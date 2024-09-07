@@ -1,16 +1,31 @@
---- app/models/mail_handler.rb  2022-06-10 20:51:39.118750900 +0300
-+++ app/models/mail_handler.rb	2024-02-19 19:20:03.000000000 +0200
-@@ -439,6 +439,18 @@
+--- "app/models/mail_handler.rb"	2024-09-07 13:34:41.385845300 +0300
++++ "app/models/mail_handler.rb"	2024-09-07 15:53:33.183043400 +0300
+@@ -59,6 +59,7 @@
+     receive(*args)
+   rescue => e
+     Rails.logger.error "MailHandler: an unexpected error occurred when receiving email: #{e.message}"
++    Rails.logger.error e.backtrace.join("\n")
+     return false
+   end
+ 
+@@ -439,6 +440,25 @@
  
      local = Regexp.escape(local)
  
-+    # Try the Delivered-To header first
++    # Try "X-FOLDER" custom header (see patched imap.rb)
++    if folder = email.header["X-FOLDER"]
++      if project = Project.find_by_identifier(folder.to_s)
++        Rails.logger.debug "Found project \"#{project.name}\" (#{project.identifier}) from X-FOLDER"
++        return project
++      end
++    end
++
++    # Try the Delivered-To header next
 +    email.header["Delivered-To"].each do |addr|
 +      next if addr.blank?
 +      if addr.to_s =~ /\A#{local}\+([^+]+)@#{domain}\z/
-+        puts "From Delivered-To: #{$1}"
 +        if project = Project.find_by_identifier($1)
-+          puts "Found project #{project}"
++          Rails.logger.debug "Found project \"#{project.name}\" (#{project.identifier}) from Delivered-To"
 +          return project
 +        end
 +      end
@@ -19,16 +34,19 @@
      [:to, :cc, :bcc].each do |field|
        header = @email[field]
        next if header.blank? || header.field.blank? || !header.field.respond_to?(:addrs)
-@@ -449,6 +461,11 @@
+@@ -446,9 +466,15 @@
+       header.field.addrs.each do |addr|
+         if addr.domain.to_s.casecmp(domain)==0 && addr.local.to_s =~ /\A#{local}\+([^+]+)\z/
+           if project = Project.find_by_identifier($1)
++            Rails.logger.debug "Found project \"#{project.name}\" (#{project.identifier}) from #{field}"
              return project
            end
          end
 +        # Also try {local} as project identifier
 +        if project = Project.find_by_identifier(addr.local.to_s)
-+          puts "Found project #{project}"
++          Rails.logger.debug "Found project \"#{project.name}\" (#{project.identifier}) from subaddress"
 +          return project
 +        end
        end
      end
      nil
-
