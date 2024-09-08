@@ -1,5 +1,5 @@
---- "app/models/mail_handler.rb"	2024-09-07 13:34:41.385845300 +0300
-+++ "app/models/mail_handler.rb"	2024-09-07 15:53:33.183043400 +0300
+--- "app/models/mail_handler.rb"    2024-09-07 13:34:41.385845300 +0300
++++ "app/models/mail_handler.rb"    2024-09-08 13:55:33.183043400 +0300
 @@ -59,6 +59,7 @@
      receive(*args)
    rescue => e
@@ -8,12 +8,43 @@
      return false
    end
  
-@@ -439,6 +440,25 @@
+@@ -147,6 +148,8 @@
+ 
+   MESSAGE_ID_RE = %r{^<?redmine\.([a-z0-9_]+)\-(\d+)\.\d+(\.[a-f0-9]+)?@}
+   ISSUE_REPLY_SUBJECT_RE = %r{\[(?:[^\]]*\s+)?#(\d+)\]}
++  # based on https://www.redmine.org/issues/38614
++  ISSUE_REPLY_SUBJECT_RE2 = %r{^(?:Re:\s*)+(.*)$}i
+   MESSAGE_REPLY_SUBJECT_RE = %r{\[[^\]]*msg(\d+)\]}
+ 
+   def dispatch
+@@ -165,7 +168,19 @@
+     elsif m = subject.match(MESSAGE_REPLY_SUBJECT_RE)
+       receive_message_reply(m[1].to_i)
+     else
+-      dispatch_to_default
++      if issue = Issue.where(subject: subject).order(id: :desc).first
++        logger&.info("MailHandler: found issue #{issue.id} using the full subject")
++        receive_issue_reply(issue.id)
++      elsif m = subject.match(ISSUE_REPLY_SUBJECT_RE2)
++        if issue = Issue.where(subject: m[1]).order(id: :desc).first
++          logger&.info("MailHandler: found issue #{issue.id} using the subject regex")
++          receive_issue_reply(issue.id)
++        else
++          dispatch_to_default
++        end
++      else
++        dispatch_to_default
++      end
+     end
+   rescue ActiveRecord::RecordInvalid => e
+     # TODO: send a email to the user
+@@ -439,6 +454,26 @@
  
      local = Regexp.escape(local)
  
 +    # Try "X-FOLDER" custom header (see patched imap.rb)
 +    if folder = email.header["X-FOLDER"]
++      Rails.logger.info "Found X-FOLDER #{folder}"
 +      if project = Project.find_by_identifier(folder.to_s)
 +        Rails.logger.debug "Found project \"#{project.name}\" (#{project.identifier}) from X-FOLDER"
 +        return project
@@ -34,7 +65,7 @@
      [:to, :cc, :bcc].each do |field|
        header = @email[field]
        next if header.blank? || header.field.blank? || !header.field.respond_to?(:addrs)
-@@ -446,9 +466,15 @@
+@@ -446,9 +481,15 @@
        header.field.addrs.each do |addr|
          if addr.domain.to_s.casecmp(domain)==0 && addr.local.to_s =~ /\A#{local}\+([^+]+)\z/
            if project = Project.find_by_identifier($1)
