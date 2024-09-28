@@ -50,6 +50,8 @@ COPY entrypoint.sh \
      ${REDMINE_LOCAL_PATH}/scripts/
 
 COPY crontab ${REDMINE_LOCAL_PATH}/
+COPY Gemfile.local $REDMINE_PATH/
+COPY scripts/email_oauth.rake $REDMINE_PATH/lib/tasks/
 
 WORKDIR $REDMINE_PATH
 

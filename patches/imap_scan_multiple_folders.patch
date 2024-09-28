@@ -1,24 +1,32 @@
---- lib/redmine/imap.rb 2017-07-16 21:18:26.000000000 +0300 
-+++ lib/redmine/imap.rb	2024-09-07 15:45:59.584164100 +0300
-@@ -28,32 +28,67 @@
+--- lib/redmine/imap.rb	2024-06-12 03:45:02.000000000 +0300
++++ lib/redmine/imap.rb	2024-09-29 02:25:42.810608800 +0300
+@@ -18,6 +18,7 @@
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ 
+ require 'net/imap'
++require 'oauth2'
+ 
+ module Redmine
+   module IMAP
+@@ -28,32 +29,69 @@
          ssl = !imap_options[:ssl].nil?
          starttls = !imap_options[:starttls].nil?
          folder = imap_options[:folder] || 'INBOX'
++        auth_type = imap_options[:auth_type] || 'LOGIN'
 +        log_file_path = Rails.root.join('log', 'incoming_emails.log')
 +        logger = Logger.new(log_file_path, 10, 1000000)
 +        logger.level = Logger::DEBUG
 +        Rails.logger = logger
 +
 +        folders = folder.split(',')
-+        exclude_folders = imap_options[:exclude_folders] || 'Drafts,Sent,Spam,Trash,DONE,ERRORS'
++        exclude_folders = imap_options[:exclude_folders] || 'Drafts,Sent,Spam,Trash,DONE,ERRORS,Archive,Calendar,Contacts,Conversation,Deleted,Journal,Junk,Notes,Tasks'
 +        exclude_folders = exclude_folders.split(',')
-+        # logger.debug "Excluded folders: #{exclude_folders}"
  
          imap = Net::IMAP.new(host, port, ssl)
          if starttls
            imap.starttls
          end
-         imap.login(imap_options[:username], imap_options[:password]) unless imap_options[:username].nil?
+-        imap.login(imap_options[:username], imap_options[:password]) unless imap_options[:username].nil?
 -        imap.select(folder)
 -        imap.uid_search(['NOT', 'SEEN']).each do |uid|
 -          msg = imap.uid_fetch(uid,'RFC822')[0].attr['RFC822']
@@ -35,16 +43,19 @@
 -            if imap_options[:move_on_failure]
 -              imap.uid_copy(uid, imap_options[:move_on_failure])
 -              imap.uid_store(uid, "+FLAGS", [:Deleted])
-+
++        imap.authenticate(auth_type, imap_options[:username], imap_options[:password]) unless imap_options[:username].nil?
++ 
 +        if folder == "*"
-+          imap_folders = imap.list("", "*").map { |folder| folder.name.sub(/^INBOX\./, '') }
++          imap_folders = imap.list("", "*").map { |folder| folder.name }
++          # logger.debug "imap_folders: #{imap_folders}" if logger && logger.debug?
 +          folders = imap_folders.reject do |element| 
 +            exclude_folders.any? { |substring| element.downcase.include?(substring.downcase) }
 +          end
 +        end
-+        # logger.info "Folders to scan: #{folders}"
++        logger.debug "Folders to scan: #{folders}" if logger && logger.debug?
 +
 +        folders.each do |folder|
++          # logger.debug "Selecting folder #{folder}" if logger && logger.debug?
 +          imap.select(folder)
 +
 +          imap.uid_search(['ALL']).each do |uid|
@@ -56,14 +67,14 @@
 +          end
 +
 +          imap.uid_search(['NOT', 'SEEN']).each do |uid|
-+            msg = imap.uid_fetch(uid,'RFC822')[0].attr['RFC822']
++            msg = imap.uid_fetch(uid, 'RFC822')[0].attr['RFC822']
 +
 +            # store folder as mail x-header
 +            mailobj = Mail.new(msg)
-+            mailobj['X-FOLDER'] = folder
++            mailobj['X-FOLDER'] = folder.sub(/^INBOX\//, '')
 +            msg = mailobj.to_s
 +
-+            logger.info "Processing message #{uid}" if logger && logger.info?
++            logger.info "Processing message #{uid} from folder #{folder}" if logger && logger.info?
 +            if MailHandler.safe_receive(msg, options)
 +              logger.info "Message #{uid} successfully received" if logger && logger.info?
 +              if imap_options[:move_on_success]
@@ -85,14 +96,3 @@
          imap.logout
          imap.disconnect
        end
-
---- lib/tasks/email.rake	2024-02-19 19:24:49.000000000 +0200
-+++ lib/tasks/email.rake	2024-02-19 17:50:26.000000000 +0200
-@@ -114,6 +114,7 @@
-                       :username => ENV['username'],
-                       :password => ENV['password'],
-                       :folder => ENV['folder'],
-+                      :exclude_folders => ENV['exclude_folders'],
-                       :move_on_success => ENV['move_on_success'],
-                       :move_on_failure => ENV['move_on_failure']}
- 

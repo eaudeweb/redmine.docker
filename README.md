@@ -66,6 +66,14 @@ docker exec -ti redmine_mysql mysql -ps3cr3t redmine -e "UPDATE users SET auth_s
 ```
 
 
-[![Docker](https://dockerbuildbadges.quelltext.eu/status.svg?organization=eaudeweb&repository=redmine)](https://hub.docker.com/r/eaudeweb/redmine/builds)
+#### Setup OAUTH for IMAP using Microsoft O365
 
-2017
+See docker volume redmine-imap-oauth:/usr/src/redmine/oauth/. This is where the .yml config files are stored.
+App registration can be created at https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade, following instructions from https://gitlab.com/muttmua/mutt/-/blob/master/contrib/mutt_oauth2.py.README#L184
+
+Once you have the tenant id, client id, client secret, run inside the docker container:
+
+    rake redmine:email:o365_oauth2_init token_file=/usr/src/redmine/oauth/edw_oauth2 client=$client_id tenant=$tenant_id secret=$app_registration_secret_value
+
+Important: when you are asked go to URL: https://login.microsoftonline.com/..., make sure to log in using helpdesk@eaudeweb.ro mail account!
+

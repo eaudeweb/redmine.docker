@@ -52,7 +52,7 @@
 +    end
 +
 +    # Try the Delivered-To header next
-+    email.header["Delivered-To"].each do |addr|
++    email.header["Delivered-To"]&.each do |addr|
 +      next if addr.blank?
 +      if addr.to_s =~ /\A#{local}\+([^+]+)@#{domain}\z/
 +        if project = Project.find_by_identifier($1)
