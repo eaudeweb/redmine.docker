@@ -1,0 +1,41 @@
+diff --git a/app/models/issue.rb b/app/models/issue.rb
+index dddb9df..8aac6a7 100644
+--- a/app/models/issue.rb
++++ b/app/models/issue.rb
+@@ -1122,7 +1122,7 @@ class Issue < ActiveRecord::Base
+     notified = notified.select {|u| u.active? && u.notify_about?(self)}
+ 
+     notified += project.notified_users
+-    notified += project.users.preload(:preference).select(&:notify_about_high_priority_issues?) if priority.high?
++    notified += project.users.preload(:preference).select(&:notify_about_high_priority_issues?) if priority.higher?
+     notified.uniq!
+     # Remove users that can not view the issue
+     notified.reject! {|user| !visible?(user)}
+diff --git a/app/models/issue_priority.rb b/app/models/issue_priority.rb
+index d60098c..ea2d029 100644
+--- a/app/models/issue_priority.rb
++++ b/app/models/issue_priority.rb
+@@ -63,6 +63,10 @@ class IssuePriority < Enumeration
+     position > self.class.default_or_middle.position
+   end
+ 
++  def higher?
++    position > IssuePriority.active.size - 2
++  end
++
+   def low?
+     position < self.class.default_or_middle.position
+   end
+diff --git a/app/views/users/_mail_notifications.html.erb b/app/views/users/_mail_notifications.html.erb
+index abf890e..c0b06a2 100644
+--- a/app/views/users/_mail_notifications.html.erb
++++ b/app/views/users/_mail_notifications.html.erb
+@@ -25,7 +25,7 @@
+ 
+ <%= fields_for :pref, @user.pref do |pref_fields| %>
+ 
+-<% if IssuePriority.default_or_middle and high_priority = IssuePriority.where(['position > ?', IssuePriority.default_or_middle.position]).first %>
++<% if IssuePriority.default_or_middle and high_priority = IssuePriority.where(['position > ?', IssuePriority.active.size - 2]).first %>
+ <p>
+   <%= pref_fields.check_box :notify_about_high_priority_issues %>
+   <label for="pref_notify_about_high_priority_issues"><%= t(:label_user_mail_notify_about_high_priority_issues_html, prio: high_priority.name.downcase) %></label>

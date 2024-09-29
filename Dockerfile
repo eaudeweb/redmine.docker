@@ -58,6 +58,7 @@ WORKDIR $REDMINE_PATH
 ADD patches/imap_scan_multiple_folders.patch \
     patches/more_project_from_receiver_addresses.patch \
     patches/subprojects_query_filter_fix.patch \
+    patches/notification_prefs_higher_prio.diff \
     # https://www.redmine.org/issues/29321
     patches/move_watchers_to_issues_content_area.diff \
     ${REDMINE_PATH}/
@@ -65,7 +66,8 @@ ADD patches/imap_scan_multiple_folders.patch \
 RUN patch -p0 < imap_scan_multiple_folders.patch \
 && patch -p0 < more_project_from_receiver_addresses.patch \
 && patch -p0 < subprojects_query_filter_fix.patch \
-&& patch -p0 < move_watchers_to_issues_content_area.diff
+&& patch -p0 < move_watchers_to_issues_content_area.diff \
+&& patch -p1 < notification_prefs_higher_prio.diff
 
 RUN gosu redmine bundle install
 
