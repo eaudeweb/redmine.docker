@@ -1,5 +1,5 @@
---- "app/models/mail_handler.rb"    2024-09-07 13:34:41.385845300 +0300
-+++ "app/models/mail_handler.rb"    2024-09-08 13:55:33.183043400 +0300
+--- app/models/mail_handler.rb	2024-06-12 00:45:02.000000000 +0000
++++ app/models/mail_handler.rb	2024-09-29 10:07:08.654106500 +0000
 @@ -59,6 +59,7 @@
      receive(*args)
    rescue => e
@@ -17,16 +17,17 @@
    MESSAGE_REPLY_SUBJECT_RE = %r{\[[^\]]*msg(\d+)\]}
  
    def dispatch
-@@ -165,7 +168,19 @@
+@@ -165,7 +168,20 @@
      elsif m = subject.match(MESSAGE_REPLY_SUBJECT_RE)
        receive_message_reply(m[1].to_i)
      else
 -      dispatch_to_default
-+      if issue = Issue.where(subject: subject).order(id: :desc).first
++      project = target_project
++      if issue = Issue.where(subject: subject, project: project).order(id: :desc).first
 +        logger&.info("MailHandler: found issue #{issue.id} using the full subject")
 +        receive_issue_reply(issue.id)
 +      elsif m = subject.match(ISSUE_REPLY_SUBJECT_RE2)
-+        if issue = Issue.where(subject: m[1]).order(id: :desc).first
++        if issue = Issue.where(subject: m[1], project: project).order(id: :desc).first
 +          logger&.info("MailHandler: found issue #{issue.id} using the subject regex")
 +          receive_issue_reply(issue.id)
 +        else
@@ -38,7 +39,7 @@
      end
    rescue ActiveRecord::RecordInvalid => e
      # TODO: send a email to the user
-@@ -439,6 +454,26 @@
+@@ -439,6 +455,26 @@
  
      local = Regexp.escape(local)
  
@@ -65,7 +66,7 @@
      [:to, :cc, :bcc].each do |field|
        header = @email[field]
        next if header.blank? || header.field.blank? || !header.field.respond_to?(:addrs)
-@@ -446,9 +481,15 @@
+@@ -446,9 +482,15 @@
        header.field.addrs.each do |addr|
          if addr.domain.to_s.casecmp(domain)==0 && addr.local.to_s =~ /\A#{local}\+([^+]+)\z/
            if project = Project.find_by_identifier($1)
