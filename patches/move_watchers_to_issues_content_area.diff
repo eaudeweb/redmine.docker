@@ -31,13 +31,18 @@ Index: app/views/issues/show.html.erb
  <% content_for :header_tags do %>
 Index: app/views/watchers/_watchers.html.erb
 ===================================================================
---- app/views/watchers/_watchers.html.erb	(Revision 17840)
-+++ app/views/watchers/_watchers.html.erb	(Arbeitskopie)
-@@ -7,6 +7,6 @@
- </div>
+--- app/views/watchers/_watchers.html.erb       2025-05-11 22:35:09.480514580 +0300
++++ app/views/watchers/_watchers.html.erb       2025-05-11 22:34:49.035803000 +0300
+@@ -9,9 +9,9 @@
  <% end %>
- 
+
+ <% if User.current.allowed_to?(:"view_#{watched_klass_name}_watchers", watched.project) %>
 -<h3><%= l(:"label_#{watched_klass_name}_watchers") %> (<%= watched.watcher_users.size %>)</h3>
 +<p><strong><%= l(:"label_#{watched_klass_name}_watchers") %> (<%= watched.watcher_users.size %>)</strong></p>
- 
+
  <%= watchers_list(watched) %>
+ <% else %>
+-<h3><%= l(:"label_#{watched_klass_name}_watchers") %></h3>
++<p><strong><%= l(:"label_#{watched_klass_name}_watchers") %></strong></p>
+ <% end %>
+ 

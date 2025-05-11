@@ -21,5 +21,8 @@ data["default"]["email_delivery"] = {
         "port": 25,
     },
 }
+
+data["default"]["database_cipher_key"] = os.environ.get("DATABASE_CIPHER_KEY", "null")
+
 with open(CONFIG_FILE, "w") as f:
     yaml.dump(data, f, indent=4)

@@ -21,11 +21,8 @@ done
 mkdir -p /home/redmine/.bundle/cache/compact_index
 chown redmine:redmine -R /home/redmine
 
-#gem install bundler --pre
-#gem install activesupport
-
-#bundle install
+# not sure if these are useful
+bundle exec rake db:migrate
+bundle exec rake redmine:plugins:migrate
 
 /docker-entrypoint.sh rails server -b 0.0.0.0
-
-# sleep 4800

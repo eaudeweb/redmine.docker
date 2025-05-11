@@ -1,4 +1,4 @@
-FROM redmine:5.1.3-bookworm
+FROM redmine:5.1.8-bookworm
 LABEL maintainer="<helpdesk@eaudeweb.ro>"
 
 
@@ -30,11 +30,14 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
  && git clone https://github.com/mikitex70/redmine_drawio.git \
  && git clone https://github.com/alphanodes/redmine_lightbox \
  && git clone -b 5.1-extended_watchers https://github.com/maxrossello/redmine_extended_watchers.git \
- && git clone http://github.com:/jperelli/Redmine-Periodic-Task.git periodictask \
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_9-light.zip \
+ && git clone https://github.com:/jperelli/Redmine-Periodic-Task.git periodictask \
+ && git clone https://github.com/sk-ys/redmine_issue_hierarchy_filter.git \
+ && git clone https://github.com/noshutdown-ru/vault.git \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_10-light.zip \
  # && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_6_6-light.zip \
  # redmine_people conflicts with redmine_extended_watchers
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_25-light.zip \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-3_1_26-light.zip \
+ && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_questions-1_0_7-light.zip \
  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redminex-resources-1-2-1.zip \
  && cd ${REDMINE_PATH} \
  && chown -R redmine:redmine ${REDMINE_PATH} ${REDMINE_LOCAL_PATH} \
