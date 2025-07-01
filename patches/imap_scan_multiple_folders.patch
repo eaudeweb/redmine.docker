@@ -52,7 +52,7 @@
 +            exclude_folders.any? { |substring| element.downcase.include?(substring.downcase) }
 +          end
 +        end
-+        logger.debug "Folders to scan: #{folders}" if logger && logger.debug?
++        # logger.debug "Folders to scan: #{folders}" if logger && logger.debug?
 +
 +        folders.each do |folder|
 +          # logger.debug "Selecting folder #{folder}" if logger && logger.debug?
