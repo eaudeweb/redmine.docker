@@ -1,0 +1,88 @@
+#main > #content > .contextual {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+#main > #content > .contextual > .drdn {
+  order: 99;
+}
+
+#main > #content > .contextual > a.icon.new-issue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  order: 100;
+  overflow: hidden;
+  transition: all 200ms ease-in-out;
+  border: none;
+  // background: #056407;
+  background: green;
+  color: white;
+  font-size: 1.3rem;
+  &:hover {
+    background: #109e13;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+  }
+  &::before {
+    content: "\eb2a"; // plus
+    font-size: 1.3rem;
+  }
+}
+
+// 6 columns for projects/settings/members
+#principals_for_new_member {
+  #principals {
+    column-count: 6;
+  }
+  label {
+    display: block;
+  }
+}
+
+#watchers {
+  > .watchers {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    > li {
+      padding-right: 10px;
+      > img {
+        display: none;
+      }
+    }
+  }
+}
+
+a.icon {
+  background-image: none;
+  &::before {
+    font-family: "tabler-icons";
+  }
+
+  &.icon-orange-tree {
+    &::before {
+      content: "\f5d4"; // binary-tree
+    }
+  }
+
+  &.icon-plane-list {
+    &::before {
+      content: "\eb6b"; // list
+    }
+  }
+
+  &.vault {
+    &::before {
+      content: "\eae2"; // lock
+    }
+  }
+  // &.icon-add.new-issue {
+  //   &::before {
+  //     content: "\eb2a"; // plus
+  //     margin-right: 0.3em;
+  //   }
+  // }
+}
