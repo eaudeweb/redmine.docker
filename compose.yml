@@ -1,5 +1,3 @@
-version: '2.0'
-
 services:
 
   redmine:
@@ -21,7 +19,7 @@ services:
       - .env
 
   mysql:
-    image: mysql:5.5
+    image: mysql:8.4
     restart: unless-stopped
     volumes:
     - mysql-data:/var/lib/mysql
@@ -33,9 +31,6 @@ services:
     command:
     - "--character-set-server=utf8mb4"
     - "--collation-server=utf8mb4_unicode_ci"
-    - "--query-cache-size=0"
-    - "--query-cache-limit=64M"
-    - "--query-cache-type=0"
     - "--innodb-buffer-pool-size=1G"
     - "--innodb-buffer-pool-instances=4"
     - "--net-read-timeout=7200"
