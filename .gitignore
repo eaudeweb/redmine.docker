@@ -1,5 +1,6 @@
 .env
 docker-compose.override.yml
+compose.override.yml
 .data
 .vscode
 *.sql
