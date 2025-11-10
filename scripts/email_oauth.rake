@@ -90,7 +90,7 @@ namespace :redmine do
 
       token_data = YAML.safe_load(
         File.read("#{token_file}.yml"),
-        permitted_classes:[SnakyHash::StringKeyed]
+        permitted_classes:[SnakyHash::StringKeyed, Symbol]
       )
       access_token = OAuth2::AccessToken.from_hash(client, token_data)
 
