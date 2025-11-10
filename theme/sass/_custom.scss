@@ -91,3 +91,7 @@ div#project-jump .projects strong {
     color: #109e13;
     font-weight: 500;
 }
+
+.issue.details>p.author {
+    padding-left: 0 !important;
+}
