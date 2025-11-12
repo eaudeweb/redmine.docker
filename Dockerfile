@@ -24,9 +24,9 @@ ENV REDMINE_PATH=/usr/src/redmine \
 
 # Install dependencies and plugins
 RUN apt-get update -q \
- && apt-get install -y --no-install-recommends apt-utils cron unzip netcat-traditional vim curl python3-pip build-essential python3-dev python3-wheel python3-setuptools imagemagick\
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends apt-utils cron unzip netcat-traditional vim curl python3-pip build-essential python3-dev python3-wheel python3-setuptools imagemagick\
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # RUN pip3 install PyYAML "ruamel.yaml<0.18.0"
 RUN pip install PyYAML --break-system-packages
@@ -34,25 +34,25 @@ RUN pip install PyYAML --break-system-packages
 COPY plugins/* ${REDMINE_LOCAL_PATH}/plugins/
 
 RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
- && mkdir -p ${REDMINE_LOCAL_PATH}/scripts \
- && mkdir -p ${REDMINE_LOCAL_PATH}/backup \
- && cd ${REDMINE_PATH}/plugins \
- && git clone --depth 1 https://github.com/agileware-jp/redmine_banner.git \
- && git clone --depth 1 https://github.com/readyredmine/redmine_silencer \
- && git clone --depth 1 https://github.com/rgtk/redmine_impersonate.git \
- && git clone --depth 1 https://github.com/rgtk/redmine_editauthor.git \
- && git clone --depth 1 -b 5.0.x https://github.com/Loriowar/redmine_issues_tree.git \
- && git clone --depth 1 https://github.com/jkraemer/stopwatch.git \
- && git clone --depth 1 https://github.com/two-pack/redmine_xlsx_format_issue_exporter.git \
- && git clone --depth 1 https://github.com/mikitex70/redmine_drawio.git \
- && git clone --depth 1 https://github.com/alphanodes/redmine_lightbox \
- && git clone --depth 1 -b 6.1-extended_watchers https://github.com/maxrossello/redmine_extended_watchers.git \
- && git clone --depth 1 https://github.com:/jperelli/Redmine-Periodic-Task.git periodictask \
- && git clone --depth 1 https://github.com/sk-ys/redmine_issue_hierarchy_filter.git \
- && git clone --depth 1 https://github.com/noshutdown-ru/vault.git \
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_12-light.zip \
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-4_0_0-light.zip \
- && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_favorite_projects-2_1_5-light.zip
+    && mkdir -p ${REDMINE_LOCAL_PATH}/scripts \
+    && mkdir -p ${REDMINE_LOCAL_PATH}/backup \
+    && cd ${REDMINE_PATH}/plugins \
+    && git clone --depth 1 https://github.com/agileware-jp/redmine_banner.git \
+    && git clone --depth 1 https://github.com/readyredmine/redmine_silencer \
+    && git clone --depth 1 https://github.com/rgtk/redmine_impersonate.git \
+    && git clone --depth 1 https://github.com/rgtk/redmine_editauthor.git \
+    && git clone --depth 1 -b 5.0.x https://github.com/Loriowar/redmine_issues_tree.git \
+    && git clone --depth 1 https://github.com/jkraemer/stopwatch.git \
+    && git clone --depth 1 https://github.com/two-pack/redmine_xlsx_format_issue_exporter.git \
+    && git clone --depth 1 https://github.com/mikitex70/redmine_drawio.git \
+    && git clone --depth 1 https://github.com/alphanodes/redmine_lightbox \
+    && git clone --depth 1 -b 6.1-extended_watchers https://github.com/maxrossello/redmine_extended_watchers.git \
+    && git clone --depth 1 https://github.com:/jperelli/Redmine-Periodic-Task.git periodictask \
+    && git clone --depth 1 https://github.com/sk-ys/redmine_issue_hierarchy_filter.git \
+    && git clone --depth 1 https://github.com/noshutdown-ru/vault.git \
+    && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_12-light.zip \
+    && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-4_0_0-light.zip \
+    && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_favorite_projects-2_1_5-light.zip
 
 # add theme
 COPY --from=theme_builder /edw/favicon ${REDMINE_PATH}/themes/EdW/favicon
@@ -63,12 +63,12 @@ COPY --from=theme_builder /theme/opale/webfonts ${REDMINE_PATH}/themes/EdW/webfo
 RUN chown -R redmine:redmine ${REDMINE_PATH} && chown -R redmine:redmine ${REDMINE_LOCAL_PATH}
 
 COPY entrypoint.sh \
-     scripts/receive_imap.sh \
-     scripts/update-repositories.sh \
-     scripts/update_configuration.py \
-     scripts/send_reminders.sh \
-     scripts/check_periodictasks.sh \
-     ${REDMINE_LOCAL_PATH}/scripts/
+    scripts/receive_imap.sh \
+    scripts/update-repositories.sh \
+    scripts/update_configuration.py \
+    scripts/send_reminders.sh \
+    scripts/check_periodictasks.sh \
+    ${REDMINE_LOCAL_PATH}/scripts/
 
 COPY crontab ${REDMINE_LOCAL_PATH}/
 COPY Gemfile.local ${REDMINE_PATH}/
