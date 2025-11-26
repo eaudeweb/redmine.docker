@@ -47,7 +47,9 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
     && git clone --depth 1 https://github.com/mikitex70/redmine_drawio.git \
     && git clone --depth 1 https://github.com/alphanodes/redmine_lightbox \
     && git clone --depth 1 -b 6.1-extended_watchers https://github.com/maxrossello/redmine_extended_watchers.git \
-    && git clone --depth 1 https://github.com:/jperelli/Redmine-Periodic-Task.git periodictask \
+    && git clone --depth 1 https://github.com/jperelli/Redmine-Periodic-Task.git periodictask \
+    && curl -s -o periodictask/support-parent-task.diff https://patch-diff.githubusercontent.com/raw/jperelli/Redmine-Periodic-Task/pull/116.patch \
+    && (cd periodictask && git apply support-parent-task.diff) \
     && git clone --depth 1 https://github.com/sk-ys/redmine_issue_hierarchy_filter.git \
     && git clone --depth 1 https://github.com/noshutdown-ru/vault.git \
     && git clone --depth 1 https://github.com/jcatrysse/redmine_description_macros.git \

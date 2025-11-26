@@ -1,0 +1,91 @@
+From 758be770fffab1f65e9a1db1bc18431000a70ce7 Mon Sep 17 00:00:00 2001
+From: Chris Chen <chrischen0618@gmail.com>
+Date: Sat, 23 Dec 2023 22:12:53 +0800
+Subject: [PATCH] feat: Add parent task to periodic tasks
+
+Signed-off-by: Chris Chen <chrischen0618@gmail.com>
+---
+ app/models/periodictask.rb                            |  2 +-
+ app/views/periodictask/_form.html.erb                 |  3 +++
+ config/locales/en.yml                                 |  1 +
+ .../20231223141012_add_parent_id_to_periodictasks.rb  | 11 +++++++++++
+ test/fixtures/periodictasks.yml                       |  2 ++
+ 5 files changed, 18 insertions(+), 1 deletion(-)
+ create mode 100644 db/migrate/20231223141012_add_parent_id_to_periodictasks.rb
+
+diff --git a/app/models/periodictask.rb b/app/models/periodictask.rb
+index 8a1b4bf..f71e987 100644
+--- a/app/models/periodictask.rb
++++ b/app/models/periodictask.rb
+@@ -41,7 +41,7 @@ def generate_issue(now = Time.now)
+       subj = parse_macro(subject.try(:dup), now)
+       desc = parse_macro(description.try(:dup), now)
+ 
+-      issue = Issue.new(:project_id => project_id, :tracker_id => tracker_id || project.trackers.first.try(:id), :category_id => issue_category_id,
++      issue = Issue.new(:project_id => project_id, :tracker_id => tracker_id || project.trackers.first.try(:id), :category_id => issue_category_id , :parent_id => parent_id,
+                         :assigned_to_id => assigned_to_id, :author_id => author_id,
+                         :subject => subj, :description => desc)
+       issue.start_date ||= now.to_date if set_start_date?
+diff --git a/app/views/periodictask/_form.html.erb b/app/views/periodictask/_form.html.erb
+index c6986a0..778b680 100644
+--- a/app/views/periodictask/_form.html.erb
++++ b/app/views/periodictask/_form.html.erb
+@@ -12,6 +12,9 @@
+       <%= l(:no_categories_in_project) %>
+     <% end %>
+   </p>
++  <p>
++    <%= label(:periodictask, :parent_id, l(:label_parent_id)) %><%= f.number_field :parent_id, step: :any %>
++  </p>
+   <p>
+     <%= label(:periodictask, :assigned_to_user_id, l(:label_assigned_to_user)) %>
+     <% if @assignables.length > 0 %>
+diff --git a/config/locales/en.yml b/config/locales/en.yml
+index 1944df6..14b78b6 100644
+--- a/config/locales/en.yml
++++ b/config/locales/en.yml
+@@ -24,6 +24,7 @@ en:
+   label_estimated_hours_after: Hours
+   label_description: Description
+   label_issue_category: Issue Category
++  label_parent_id: Issue Parent task
+   label_unit_day: day(s)
+   label_unit_business_day: business day(s)
+   label_unit_week: week(s)
+diff --git a/db/migrate/20231223141012_add_parent_id_to_periodictasks.rb b/db/migrate/20231223141012_add_parent_id_to_periodictasks.rb
+new file mode 100644
+index 0000000..28a8e8a
+--- /dev/null
++++ b/db/migrate/20231223141012_add_parent_id_to_periodictasks.rb
+@@ -0,0 +1,11 @@
++active_record_migration_class = ActiveRecord::Migration.respond_to?(:current_version) ? ActiveRecord::Migration[4.2] : ActiveRecord::Migration
++
++class AddParentIdToPeriodictasks < active_record_migration_class
++  def self.up
++    add_column :periodictasks, :parent_id, :integer, :null => true, :default => nil
++  end
++
++  def self.down
++    remove_column :periodictasks, :parent_id
++  end
++end
+diff --git a/test/fixtures/periodictasks.yml b/test/fixtures/periodictasks.yml
+index b61837d..be21414 100644
+--- a/test/fixtures/periodictasks.yml
++++ b/test/fixtures/periodictasks.yml
+@@ -4,6 +4,7 @@ one:
+   project_id: 1
+   tracker_id: 1
+   issue_category_id: 1
++  parent_id: 1
+   assigned_to_id: 1
+   author_id: 1
+   subject: MyString
+@@ -17,6 +18,7 @@ two:
+   project_id: 1
+   tracker_id: 1
+   issue_category_id: 1
++  parent_id: 1
+   assigned_to_id: 1
+   author_id: 1
+   subject: MyString
