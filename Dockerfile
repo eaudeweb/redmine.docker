@@ -41,7 +41,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
     && git clone --depth 1 https://github.com/readyredmine/redmine_silencer \
     && git clone --depth 1 https://github.com/rgtk/redmine_impersonate.git \
     && git clone --depth 1 https://github.com/rgtk/redmine_editauthor.git \
-    && git clone --depth 1 -b 5.0.x https://github.com/Loriowar/redmine_issues_tree.git \
+    && git clone --depth 1 -b 6.1.x https://github.com/Loriowar/redmine_issues_tree.git \
     && git clone --depth 1 https://github.com/jkraemer/stopwatch.git \
     && git clone --depth 1 https://github.com/two-pack/redmine_xlsx_format_issue_exporter.git \
     && git clone --depth 1 https://github.com/mikitex70/redmine_drawio.git \
