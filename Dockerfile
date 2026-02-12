@@ -51,13 +51,14 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
     && curl -s -o periodictask/support-parent-task.diff https://patch-diff.githubusercontent.com/raw/jperelli/Redmine-Periodic-Task/pull/116.patch \
     && (cd periodictask && git apply support-parent-task.diff) \
     && git clone --depth 1 https://github.com/sk-ys/redmine_issue_hierarchy_filter.git \
-    && git clone --depth 1 https://github.com/noshutdown-ru/vault.git \
+    && git clone --depth 1 -b release_0.8.1 https://github.com/noshutdown-ru/vault.git \
     && git clone --depth 1 https://github.com/jcatrysse/redmine_description_macros.git \
     && git clone --depth 1 https://github.com/orchitech/redmine_reformat.git \
     && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_6_12-light.zip \
     && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-4_0_0-light.zip \
     #  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_6_12-light.zip \
     # redmine_people conflicts with extended_watchers
+    && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmineup_tags-2_1_0-light.zip \
     && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_favorite_projects-2_1_5-light.zip
 
 # add theme
