@@ -58,7 +58,7 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
     && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-4_0_0-light.zip \
     #  && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_people-1_6_12-light.zip \
     # redmine_people conflicts with extended_watchers
-    && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmineup_tags-2_1_0-light.zip \
+    && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmineup_tags-2_1_0-light-patched.zip \
     && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_favorite_projects-2_1_5-light.zip
 
 # add theme
