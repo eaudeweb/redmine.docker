@@ -1,0 +1,18 @@
+--- a/lib/redmine/codeset_util.rb
++++ b/lib/redmine/codeset_util.rb
+@@ -34,9 +34,13 @@
+       enc = encoding.blank? ? "UTF-8" : encoding
+       if enc.casecmp("UTF-8") != 0
+-        str.force_encoding(enc)
+-        str = str.encode("UTF-8", :invalid => :replace,
+-              :undef => :replace, :replace => '?')
++        begin
++          str.force_encoding(enc)
++          str = str.encode("UTF-8", :invalid => :replace,
++                :undef => :replace, :replace => '?')
++        rescue Encoding::ConverterNotFoundError, ArgumentError
++          str = replace_invalid_utf8(str)
++        end
+       else
+         str = replace_invalid_utf8(str)
+       end

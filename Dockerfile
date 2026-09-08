@@ -89,6 +89,7 @@ ADD patches/imap_scan_multiple_folders.patch \
     patches/notification_prefs_higher_prio.diff \
     # https://www.redmine.org/issues/29321
     patches/move_watchers_to_issues_content_area.diff \
+    patches/codeset_util_utf.patch \
     ${REDMINE_PATH}/
 
 RUN patch -p0 < imap_scan_multiple_folders.patch
@@ -96,6 +97,7 @@ RUN patch -p0 < more_project_from_receiver_addresses.patch
 RUN patch -p0 < subprojects_query_filter_fix.patch
 RUN patch -p0 < move_watchers_to_issues_content_area.diff
 RUN patch -p1 < notification_prefs_higher_prio.diff
+RUN patch -p1 < codeset_util_utf.patch
 
 RUN gosu redmine bundle install
 
