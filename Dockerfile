@@ -51,7 +51,6 @@ RUN mkdir -p ${REDMINE_LOCAL_PATH}/github \
     && git clone --depth 1 https://github.com/jperelli/Redmine-Periodic-Task.git periodictask \
     && curl -fsSL -o /tmp/redmine_issues_tree_pr149.patch https://patch-diff.githubusercontent.com/raw/Loriowar/redmine_issues_tree/pull/149.patch \
     && git clone --depth 1 https://github.com/sk-ys/redmine_issue_hierarchy_filter.git \
-    && git clone --depth 1 -b release_0.8.1 https://github.com/noshutdown-ru/vault.git \
     && git clone --depth 1 https://github.com/jcatrysse/redmine_description_macros.git \
     && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_agile-1_7_0-light.zip \
     && unzip -d ${REDMINE_PATH}/plugins -o ${REDMINE_LOCAL_PATH}/plugins/redmine_checklists-4_1_0-light.zip \
