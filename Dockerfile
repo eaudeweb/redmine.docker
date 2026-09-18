@@ -24,7 +24,7 @@ ENV REDMINE_PATH=/usr/src/redmine \
 
 # Install dependencies and plugins
 RUN apt-get update -q \
-    && apt-get install -y --no-install-recommends apt-utils cron unzip netcat-traditional vim curl python3-pip build-essential python3-dev python3-wheel python3-setuptools imagemagick\
+    && apt-get install -y --no-install-recommends apt-utils cron unzip netcat-traditional vim curl pandoc python3-pip build-essential python3-dev python3-wheel python3-setuptools imagemagick \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
