@@ -22,7 +22,7 @@ Index: app/views/issues/show.html.erb
  
 -  <% if User.current.allowed_to?(:add_issue_watchers, @project) ||
 -    (@issue.watchers.present? && User.current.allowed_to?(:view_issue_watchers, @project)) %>
--    <div id="watchers">
+-    <div id="watchers" data-watchable-id="<%= @issue.id %>">
 -      <%= render :partial => 'watchers/watchers', :locals => {:watched => @issue} %>
 -    </div>
 -  <% end %>
@@ -45,4 +45,3 @@ Index: app/views/watchers/_watchers.html.erb
 -<h3><%= l(:"label_#{watched_klass_name}_watchers") %></h3>
 +<p><strong><%= l(:"label_#{watched_klass_name}_watchers") %></strong></p>
  <% end %>
- 

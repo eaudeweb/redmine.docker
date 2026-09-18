@@ -1,0 +1,8 @@
+--- plugins/redmineup_tags/app/views/issues/_tags_sidebar.html.erb
++++ plugins/redmineup_tags/app/views/issues/_tags_sidebar.html.erb
+@@ -1,5 +1,5 @@
+-<% unless sidebar_tags.empty? -%>
++<% if defined?(sidebar_tags) && sidebar_tags.present? -%>
+ <div class="sidebar-tags">
+   <h3><%= l(:tags) %></h3>
+   <%= render_sidebar_tags %>

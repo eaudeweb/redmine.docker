@@ -29,6 +29,7 @@ services:
     env_file:
       - .env
     command:
+    - "--mysql-native-password=ON"
     - "--character-set-server=utf8mb4"
     - "--collation-server=utf8mb4_unicode_ci"
     - "--innodb-buffer-pool-size=1G"

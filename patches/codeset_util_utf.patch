@@ -1,7 +1,7 @@
 --- a/lib/redmine/codeset_util.rb
 +++ b/lib/redmine/codeset_util.rb
-@@ -34,9 +34,13 @@
-       enc = encoding.blank? ? "UTF-8" : encoding
+@@ -35,9 +35,13 @@
+       enc = (encoding.presence || "UTF-8")
        if enc.casecmp("UTF-8") != 0
 -        str.force_encoding(enc)
 -        str = str.encode("UTF-8", :invalid => :replace,
