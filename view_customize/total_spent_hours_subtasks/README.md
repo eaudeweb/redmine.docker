@@ -8,6 +8,7 @@ Create one View Customize entry with these values:
 | Project pattern | *(empty)* |
 | Insertion position | `Bottom of issue detail` |
 | Type | `JavaScript` |
+| Comment | Shows direct and cumulative spent time for subtasks |
 | Enabled | Yes |
 | Private | Yes, while testing |
 

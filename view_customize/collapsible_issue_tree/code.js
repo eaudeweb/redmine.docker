@@ -103,26 +103,33 @@ const initializeCollapsibleIssueTree = () => {
 
     const heading = tree.querySelector('p > strong')?.parentElement;
     if (heading) {
-      const actions = document.createElement('span');
-      actions.className = 'issue-tree-actions';
-      actions.innerHTML = `
+      const actions = heading.querySelector('.issue-tree-actions') || document.createElement('span');
+      if (!actions.dataset.collapsibleIssueTreeActions) {
+        const separator = actions.childNodes.length
+          ? '<span aria-hidden="true"> | </span>'
+          : '';
+        actions.className = 'issue-tree-actions';
+        actions.dataset.collapsibleIssueTreeActions = 'true';
+        actions.insertAdjacentHTML('afterbegin', `
         <a href="#" data-issue-tree-action="collapse">Collapse all</a>
         <span aria-hidden="true"> | </span>
         <a href="#" data-issue-tree-action="expand">Expand all</a>
-      `;
-      actions.addEventListener('click', (event) => {
-        const action = event.target.closest('[data-issue-tree-action]');
-        if (!action) return;
+        ${separator}
+        `);
+        actions.addEventListener('click', (event) => {
+          const action = event.target.closest('[data-issue-tree-action]');
+          if (!action) return;
 
-        event.preventDefault();
-        if (action.dataset.issueTreeAction === 'collapse') {
-          branchRows.forEach((row) => collapsed.add(row.id));
-        } else {
-          collapsed.clear();
-        }
-        refresh();
-      });
-      heading.appendChild(actions);
+          event.preventDefault();
+          if (action.dataset.issueTreeAction === 'collapse') {
+            branchRows.forEach((row) => collapsed.add(row.id));
+          } else {
+            collapsed.clear();
+          }
+          refresh();
+        });
+        if (!actions.parentElement) heading.appendChild(actions);
+      }
     }
 
     refresh();

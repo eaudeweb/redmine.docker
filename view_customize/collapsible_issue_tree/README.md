@@ -8,6 +8,7 @@ Create one View Customize entry with these values:
 | Project pattern | *(empty)* |
 | Insertion position | `Bottom of issue detail` |
 | Type | `JavaScript` |
+| Comment | Adds expand/collapse controls for multi-level subtasks |
 | Enabled | Yes |
 | Private | No, after testing |
 
