@@ -15,5 +15,7 @@ Create one View Customize entry with these values:
 Paste the contents of `code.js` into the Code field.
 
 The code is scoped to `#issue_tree` and adds expand/collapse controls for
-subtasks with children. It does not change issue data or make additional
-requests.
+subtasks with children. It reserves a fixed toggle gutter for every issue row,
+so subjects remain aligned whether or not the row has children, and uses a
+more visible 24px indentation between hierarchy levels. It does not change
+issue data or make additional requests.

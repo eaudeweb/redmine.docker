@@ -10,11 +10,32 @@ const initializeCollapsibleIssueTree = () => {
 
   const style = document.createElement('style');
   style.textContent = `
+    #issue_tree td.subject.issue-tree-subject {
+      position: relative;
+      background-image: none !important;
+    }
+
+    #issue_tree td.subject.issue-tree-subject::before {
+      display: none !important;
+      content: none !important;
+    }
+
+    #issue_tree .issue-tree-gutter {
+      display: inline-flex;
+      width: 24px;
+      height: 17px;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 24px;
+      margin-bottom: 3px;
+      line-height: 15px;
+      vertical-align: middle;
+    }
+
     #issue_tree .issue-tree-toggle {
       display: inline-flex;
-      width: 1.35em;
-      height: 1.35em;
-      margin-inline-end: 0.35em;
+      width: 100%;
+      height: 17px;
       align-items: center;
       justify-content: center;
       padding: 0;
@@ -23,8 +44,7 @@ const initializeCollapsibleIssueTree = () => {
       box-shadow: none;
       color: inherit;
       font-size: 1.25em;
-      line-height: 1;
-      vertical-align: middle;
+      line-height: 15px;
       cursor: pointer;
       appearance: none;
     }
@@ -51,6 +71,23 @@ const initializeCollapsibleIssueTree = () => {
       const nextRow = rows[index + 1];
       return nextRow && depthOf(nextRow) > depthOf(row);
     });
+
+  const toggleGutterWidth = 24;
+  rows.forEach((row) => {
+    const subject = row.querySelector('td.subject');
+    if (!subject) return;
+
+    const padding = parseFloat(getComputedStyle(subject).paddingInlineStart) || 0;
+    const depth = depthOf(row);
+    const extraIndentPerLevel = toggleGutterWidth - 16;
+    const extraIndent = depth * extraIndentPerLevel;
+    subject.classList.add('issue-tree-subject');
+    subject.style.paddingInlineStart = `${padding + extraIndent}px`;
+
+    const gutter = document.createElement('span');
+    gutter.className = 'issue-tree-gutter';
+    subject.prepend(gutter);
+  });
 
   const refresh = () => {
     const collapsedAncestors = [];
@@ -98,8 +135,8 @@ const initializeCollapsibleIssueTree = () => {
       }
       refresh();
     });
-      subject.prepend(toggle);
-    });
+      subject.querySelector('.issue-tree-gutter').append(toggle);
+  });
 
     const heading = tree.querySelector('p > strong')?.parentElement;
     if (heading) {
