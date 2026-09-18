@@ -18,7 +18,8 @@ The customization adds a `Spent time` column immediately after the assignee
 and before the deadline field in `#issue_tree`. It loads each visible issue through its
 same-origin Redmine issue-detail API endpoint. Branch rows show their direct time and a cumulative total
 including all visible descendants, for example `1.00 h (Total: 49.50 h)`. The
-cumulative value links to the corresponding spent-time report.
+cumulative value links to the corresponding spent-time report. The progress column
+and the start-date and deadline columns are hidden on all screen sizes.
 
 Before enabling it, configure the View Customize plugin:
 

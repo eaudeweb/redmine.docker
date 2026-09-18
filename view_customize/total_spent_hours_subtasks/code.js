@@ -4,7 +4,19 @@ const initializeSubtaskSpentHours = () => {
   if (!table || table.dataset.spentHoursInitialized) return;
 
   const style = document.createElement('style');
-  style.textContent = '#issue_tree th.done_ratio, #issue_tree td.done_ratio { display: none; }';
+  style.textContent = `
+    #issue_tree th.done_ratio,
+    #issue_tree td.done_ratio {
+      display: none !important;
+    }
+
+    #issue_tree th.start_date,
+    #issue_tree td.start_date,
+    #issue_tree th.due_date,
+    #issue_tree td.due_date {
+      display: none !important;
+    }
+  `;
   document.head.appendChild(style);
 
   const rows = Array.from(table.querySelectorAll('tbody > tr.issue'));
