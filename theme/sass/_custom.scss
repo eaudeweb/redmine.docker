@@ -40,6 +40,10 @@
     content: "\eb2a"; // plus
     font-size: 1.3rem;
   }
+  // Redmine 7 also renders an inline add SVG; keep the custom glyph above.
+  > svg {
+    display: none;
+  }
 }
 
 // 6 columns for projects/settings/members
@@ -70,18 +74,6 @@ a.icon {
   background-image: none;
   &::before {
     font-family: "tabler-icons";
-  }
-
-  &.icon-orange-tree {
-    &::before {
-      content: "\f5d4"; // binary-tree
-    }
-  }
-
-  &.icon-plane-list {
-    &::before {
-      content: "\eb6b"; // list
-    }
   }
 
   &.vault {
