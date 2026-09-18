@@ -1,0 +1,9 @@
+--- plugins/redmine_issues_tree/config/routes.rb
++++ plugins/redmine_issues_tree/config/routes.rb
+@@ -3,2 +3,2 @@
+  resources :projects do
+-    resources :issues_trees, only: :none do
++    resources :issues_trees, only: [] do
+@@ -16,1 +16,1 @@
+-  resources :issues_trees, only: :none do
++  resources :issues_trees, only: [] do

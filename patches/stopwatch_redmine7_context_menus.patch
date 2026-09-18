@@ -1,0 +1,11 @@
+--- plugins/stopwatch/lib/stopwatch/context_menus_controller_patch.rb
++++ plugins/stopwatch/lib/stopwatch/context_menus_controller_patch.rb
+@@ -20,7 +20,7 @@
+     end
+ 
+     def self.apply
+-      ContextMenusController.class_eval do
++      ContextMenus::IssuesController.class_eval do
+         helper Helper
+       end
+     end

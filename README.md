@@ -23,7 +23,7 @@ Edit the secrets
 
 Start redmine
 
-    docker-compose up -d
+    docker compose up -d
 
 Initial configuration
 
@@ -51,10 +51,21 @@ A cron task will update the repository every 15 minutes.
 
 ### Local development and testing
 
-If you want to test changes locally:
+For local development and testing, create the ignored `compose.override.yml`
+from the tracked example if it does not already exist:
 
-1. build a custom image locally `docker build -t eaudeweb/redmine-local .`
-1. Copy `docker-compose.dev.yml` to `docker-compose.override.yml` to include the local image.
+    cp compose.dev.yml compose.override.yml
+
+The override builds the image locally, exposes Redmine on port 8090, and starts
+the dummy SMTP service. Docker Compose loads it automatically alongside
+`compose.yml`; no `-f` options are needed.
+
+Rebuild and start the local stack with:
+
+    docker compose build --no-cache redmine
+    docker compose up -d --force-recreate redmine
+
+The tracked `compose.dev.yml` is kept as an example configuration.
 
 
 #### To reset your password
@@ -76,4 +87,3 @@ Once you have the tenant id, client id, client secret, run inside the docker con
     rake redmine:email:o365_oauth2_init token_file=/usr/src/redmine/oauth/edw_oauth2 client=$client_id tenant=$tenant_id secret=$app_registration_secret_value
 
 Important: when you are asked go to URL: https://login.microsoftonline.com/..., make sure to log in using helpdesk@eaudeweb.ro mail account!
-

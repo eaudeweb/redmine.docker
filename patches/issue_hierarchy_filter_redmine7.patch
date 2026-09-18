@@ -1,0 +1,25 @@
+--- plugins/redmine_issue_hierarchy_filter/lib/issue_hierarchy_filter/patches/common_query_patch_methods.rb
++++ plugins/redmine_issue_hierarchy_filter/lib/issue_hierarchy_filter/patches/common_query_patch_methods.rb
+@@ -3,11 +3,6 @@
+     module CommonQueryPatchMethods
+       extend ActiveSupport::Concern
+ 
+-      included do
+-        alias_method :initialize_available_filters_without_issue_hierarchy_filter, :initialize_available_filters
+-        alias_method :initialize_available_filters, :initialize_available_filters_with_issue_hierarchy_filter
+-      end
+-
+       def sql_for_issue_level_field(field, operator, value)
+         subquery =
+           "SELECT il.issue_id " +
+@@ -31,8 +26,8 @@
+         "issues.id IN (#{subquery})"
+       end
+ 
+-      def initialize_available_filters_with_issue_hierarchy_filter
+-        initialize_available_filters_without_issue_hierarchy_filter
++      def initialize_available_filters
++        super
+ 
+         add_available_filter("issue_level", type: :integer)
+       end
