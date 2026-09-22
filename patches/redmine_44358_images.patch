@@ -1,0 +1,283 @@
+---
+ app/controllers/attachments_controller.rb     |  19 ++++-
+ app/models/attachment.rb                      |  24 ++++--
+ config/routes.rb                              |   1 +
+ lib/redmine/markdownizer.rb                   |   7 +-
+ .../functional/attachments_controller_test.rb |  69 ++++++++++++++++++
+ test/integration/routing/attachments_test.rb  |   2 +
+ test/unit/attachment_test.rb                  |   9 +--
+ 7 files changed, 114 insertions(+), 17 deletions(-)
+
+diff --git a/app/controllers/attachments_controller.rb b/app/controllers/attachments_controller.rb
+index 283803d7b..e64a8dd27 100644
+--- a/app/controllers/attachments_controller.rb
++++ b/app/controllers/attachments_controller.rb
+@@ -20,11 +20,11 @@
+ class AttachmentsController < ApplicationController
+   include ActionView::Helpers::NumberHelper
+ 
+-  before_action :find_attachment, :only => [:show, :download, :thumbnail, :update, :destroy]
++  before_action :find_attachment, :only => [:show, :download, :thumbnail, :update, :destroy, :preview_media]
+   before_action :find_container, :only => [:edit_all, :update_all, :download_all]
+   before_action :find_downloadable_attachments, :only => :download_all
+   before_action :find_editable_attachments, :only => [:edit_all, :update_all]
+-  before_action :file_readable, :read_authorize, :only => [:show, :download, :thumbnail]
++  before_action :file_readable, :read_authorize, :only => [:show, :download, :thumbnail, :preview_media]
+   before_action :update_authorize, :only => :update
+   before_action :delete_authorize, :only => :destroy
+   before_action :authorize_global, :only => :upload
+@@ -33,7 +33,7 @@ class AttachmentsController < ApplicationController
+   # MIME type text/javascript.
+   skip_after_action :verify_same_origin_request, :only => :download
+ 
+-  accept_api_auth :show, :download, :thumbnail, :upload, :update, :destroy
++  accept_api_auth :show, :download, :thumbnail, :upload, :update, :destroy, :preview_media
+ 
+   def show
+     respond_to do |format|
+@@ -101,6 +101,19 @@ class AttachmentsController < ApplicationController
+     end
+   end
+ 
++  def preview_media
++    if (media = @attachment.preview_media(params[:path]))
++      if stale?(etag: media, template: false)
++        send_file(media,
++          :type => Redmine::MimeType.of(media).presence || 'application/octet-stream',
++          :filename => "preview_#{@attachment.id}_#{File.basename(media)}",
++          :disposition => 'inline')
++      end
++    else
++      head :not_found
++    end
++  end
++
+   def upload
+     # Make sure that API users get used to set this content type
+     # as it won't trigger Rails' automatic parsing of the request body for parameters
+diff --git a/app/models/attachment.rb b/app/models/attachment.rb
+index 6ac97daf3..a4d5eb93c 100644
+--- a/app/models/attachment.rb
++++ b/app/models/attachment.rb
+@@ -297,9 +297,7 @@ class Attachment < ApplicationRecord
+   end
+ 
+   def self.clear_markdownized_previews
+-    Dir.glob(File.join(markdownized_previews_storage_path, "*.md")).each do |file|
+-      File.delete file
+-    end
++    FileUtils.rm_rf(Dir.glob(File.join(markdownized_previews_storage_path, '*')))
+   end
+ 
+   def is_text?
+@@ -342,7 +340,7 @@ class Attachment < ApplicationRecord
+     return nil unless markdownized_previewable?
+ 
+     target = markdownized_preview_cache_path
+-    if Redmine::Markdownizer.convert(diskfile, target)
++    if Redmine::Markdownizer.convert(diskfile, target, id)
+       File.read(target, :mode => "rb")
+     end
+   rescue => e
+@@ -355,8 +353,22 @@ class Attachment < ApplicationRecord
+     nil
+   end
+ 
++  def preview_media(path)
++    base_path = File.expand_path(File.join(self.class.markdownized_previews_storage_path, id.to_s))
++    file_path = File.expand_path(path, base_path)
++
++    return nil unless file_path.start_with?(base_path)
++    return nil unless File.file?(file_path)
++
++    file_path
++  end
++
++  def markdownized_preview_directory
++    File.join(self.class.markdownized_previews_storage_path, id.to_s)
++  end
++
+   def markdownized_preview_cache_path
+-    File.join(self.class.markdownized_previews_storage_path, "#{digest}_#{filesize}.md")
++    File.join(markdownized_preview_directory, "preview.md")
+   end
+ 
+   def previewable?
+@@ -590,7 +602,7 @@ class Attachment < ApplicationRecord
+     Dir[thumbnail_path("*")].each do |thumb|
+       File.delete(thumb)
+     end
+-    FileUtils.rm_f(markdownized_preview_cache_path)
++    FileUtils.rm_rf(markdownized_preview_directory)
+   end
+ 
+   def thumbnail_path(size)
+diff --git a/config/routes.rb b/config/routes.rb
+index ce15da420..5789a79d0 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -328,6 +328,7 @@ Rails.application.routes.draw do
+   get 'attachments/download/:id/:filename', :to => 'attachments#download', :id => /\d+/, :filename => /.*/, :as => 'download_named_attachment', :format => 'html'
+   get 'attachments/download/:id', :to => 'attachments#download', :id => /\d+/
+   get 'attachments/thumbnail/:id(/:size)', :to => 'attachments#thumbnail', :id => /\d+/, :size => /\d+/, :as => 'thumbnail'
++  get 'attachments/markdownized_previews/:id/*path', :to => 'attachments#preview_media', :id => /\d+/, :format => false
+   resources :attachments, :only => [:show, :update, :destroy]
+ 
+   # register plugin object types with ObjectTypeConstraint.register_object_type(PluginModel.name.underscore.pluralize')
+diff --git a/lib/redmine/markdownizer.rb b/lib/redmine/markdownizer.rb
+index ac1c67203..5fe3adfb5 100644
+--- a/lib/redmine/markdownizer.rb
++++ b/lib/redmine/markdownizer.rb
+@@ -35,7 +35,7 @@ module Redmine
+       markdownizable_extensions.include?(File.extname(filename.to_s).downcase)
+     end
+ 
+-    def self.convert(source, target)
++    def self.convert(source, target, attachment_id)
+       return nil unless available?
+       return target if File.exist?(target)
+ 
+@@ -45,14 +45,15 @@ module Redmine
+       end
+ 
+       directory = File.dirname(target)
++      basedir = File.dirname(Attachment.markdownized_previews_storage_path)
+       FileUtils.mkdir_p(directory)
+-      args = [COMMAND, source, "-t", "gfm"]
++      args = [COMMAND, source, "-t", "gfm", "--extract-media=markdownized_previews/#{attachment_id}/"]
+       pid = nil
+       output = Tempfile.new('markdownized-preview')
+ 
+       begin
+         Timeout.timeout(PREVIEW_GENERATION_TIMEOUT) do
+-          pid = Process.spawn(*args, out: output.path)
++          pid = Process.spawn(*args, chdir: basedir, out: output.path)
+           _, status = Process.wait2(pid)
+           unless status.success?
+             logger.error("Markdownized preview generation failed (#{status.exitstatus}):\nCommand: #{args.shelljoin}")
+
+diff --git a/test/functional/attachments_controller_test.rb b/test/functional/attachments_controller_test.rb
+index f2eefcb4a..d63011be3 100644
+--- a/test/functional/attachments_controller_test.rb
++++ b/test/functional/attachments_controller_test.rb
+@@ -287,6 +287,15 @@ class AttachmentsControllerTest < Redmine::ControllerTest
+     assert_equal 'text/html', @response.media_type
+     assert_select 'div.filecontent.wiki', :text => /Redmine is a flexible project management web application/
+     assert_select '.nodata', :count => 0
++    assert_select 'div.filecontent.wiki img', 1
++    img = css_select('div.filecontent.wiki img').first
++    assert_match(%r{markdownized_previews/#{a.id}/}, img['src'])
++    path = img['src'][%r{markdownized_previews/#{a.id}/(.+)$}, 1]
++
++    get(:preview_media, :params => {:id => a.id, :path => path})
++
++    assert_response :success
++    assert_equal 'image/png', response.media_type
+   end
+ 
+   def test_show_libreoffice_writer
+@@ -309,6 +318,66 @@ class AttachmentsControllerTest < Redmine::ControllerTest
+     assert_equal 'text/html', @response.media_type
+     assert_select 'div.filecontent.wiki', :text => /Redmine is a flexible project management web application/
+     assert_select '.nodata', :count => 0
++    assert_select 'div.filecontent.wiki img', 1
++    img = css_select('div.filecontent.wiki img').first
++    assert_match(%r{markdownized_previews/#{a.id}/}, img['src'])
++    path = img['src'][%r{markdownized_previews/#{a.id}/(.+)$}, 1]
++
++    get(:preview_media, :params => {:id => a.id, :path => path})
++
++    assert_response :success
++    assert_equal 'image/png', response.media_type
++  end
++
++  def test_preview_media_from_private_issue_without_permission
++    attachment = Attachment.find(15)
++    FileUtils.mkdir_p(File.join(attachment.markdownized_preview_directory, 'Pictures'))
++    File.binwrite(File.join(attachment.markdownized_preview_directory, 'Pictures', 'image.png'), 'PNG')
++
++    get(:preview_media, :params => {:id => attachment.id, :path => 'Pictures/image.png'})
++
++    assert_response :unauthorized
++  end
++
++  def test_preview_media_from_private_issue_with_permission
++    @request.session[:user_id] = 2
++
++    attachment = Attachment.find(15)
++    FileUtils.mkdir_p(File.join(attachment.markdownized_preview_directory, 'Pictures'))
++    File.binwrite(File.join(attachment.markdownized_preview_directory, 'Pictures', 'image.png'), 'PNG')
++
++    get(:preview_media, :params => {:id => attachment.id, :path => 'Pictures/image.png'})
++
++    assert_response :success
++    assert_equal 'image/png', response.media_type
++  end
++
++  def test_preview_media_should_be_denied_without_permission
++    @request.session[:user_id] = 3
++
++    attachment = Attachment.find(15)
++    FileUtils.mkdir_p(File.join(attachment.markdownized_preview_directory, 'Pictures'))
++    File.binwrite(File.join(attachment.markdownized_preview_directory, 'Pictures', 'image.png'), 'PNG')
++
++    get(:preview_media, :params => {:id => attachment.id, :path => 'Pictures/image.png'})
++
++    assert_response :forbidden
++  end
++
++  def test_preview_media_should_return_404_for_missing_file
++    @request.session[:user_id] = 2
++
++    get(:preview_media, :params => {:id => 16, :path => 'media/missing.png'})
++
++    assert_response :not_found
++  end
++
++  def test_preview_media_should_return_404_for_invalid_path
++    @request.session[:user_id] = 2
++
++    get(:preview_media, :params => {:id => 16, :path => '../secret.txt'})
++
++    assert_response :not_found
+   end
+ 
+   def test_show_other_with_no_preview
+diff --git a/test/integration/routing/attachments_test.rb b/test/integration/routing/attachments_test.rb
+index 18b411f99..88bfc6d22 100644
+--- a/test/integration/routing/attachments_test.rb
++++ b/test/integration/routing/attachments_test.rb
+@@ -31,6 +31,8 @@ class RoutingAttachmentsTest < Redmine::RoutingTest
+     should_route 'GET /attachments/thumbnail/1' => 'attachments#thumbnail', :id => '1'
+     should_route 'GET /attachments/thumbnail/1/200' => 'attachments#thumbnail', :id => '1', :size => '200'
+ 
++    should_route 'GET /attachments/markdownized_previews/1/pictures/image.png' => 'attachments#preview_media', :id => '1', :path => 'pictures/image.png'
++
+     should_route 'DELETE /attachments/1' => 'attachments#destroy', :id => '1'
+ 
+     should_route 'GET /attachments/issues/1/edit' => 'attachments#edit_all', :object_type => 'issues', :object_id => '1'
+diff --git a/test/unit/attachment_test.rb b/test/unit/attachment_test.rb
+index 820feafde..2469eb23f 100644
+--- a/test/unit/attachment_test.rb
++++ b/test/unit/attachment_test.rb
+@@ -683,13 +683,12 @@ class AttachmentTest < ActiveSupport::TestCase
+       ),
+       :author => User.find(1)
+     )
+-    preview = attachment.markdownized_preview_cache_path
+-    FileUtils.mkdir_p(File.dirname(preview))
+-    File.write(preview, "preview")
+-    assert File.exist?(preview)
++    preview_dir = attachment.markdownized_preview_directory
++    attachment.markdownized_preview_content
++    assert Dir.exist?(preview_dir)
+ 
+     attachment.send(:delete_from_disk!)
+-    assert_not File.exist?(preview)
++    assert_not Dir.exist?(preview_dir)
+   end
+ 
+   if convert_installed?
+-- 
+2.43.0
+

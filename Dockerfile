@@ -93,6 +93,9 @@ ADD patches/imap_scan_multiple_folders.patch \
     patches/stopwatch_redmine7_context_menus.patch \
     patches/issue_hierarchy_filter_redmine7.patch \
     patches/issues_tree_rails8_routes.patch \
+    # https://www.redmine.org/issues/44358
+    patches/redmine_44358_images.patch \
+    patches/redmine_44358_placeholder.patch \
     ${REDMINE_PATH}/
 
 RUN patch -p0 < imap_scan_multiple_folders.patch
@@ -108,6 +111,8 @@ RUN patch -p0 < issue_hierarchy_filter_redmine7.patch
 RUN cd ${REDMINE_PATH}/plugins/redmine_issues_tree \
     && git apply /tmp/redmine_issues_tree_pr149.patch
 RUN patch -p0 < issues_tree_rails8_routes.patch
+RUN patch -p1 < redmine_44358_images.patch
+RUN patch -p1 < redmine_44358_placeholder.patch
 
 RUN gosu redmine bundle install
 
