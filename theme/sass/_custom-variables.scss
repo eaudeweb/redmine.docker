@@ -1,5 +1,63 @@
 @use "variables" with (
   $brand-primary: #109e13,
   $header-bg: #109e13,
-  $brand-accent: #d3f8d2
+  $brand-accent: #d3f8d2,
+  $tracker-custom-colors-map: (
+    5: (
+      background: #ffe5b4,
+      color: #5d3b00
+    )
+  ),
+  $status-custom-colors-map: (
+    // ID 1: New
+    status-1: (
+      background: #2f83b7,
+      color: #fff
+    ),
+    // ID 2: Under work
+    status-2: (
+      background: #b07d00,
+      color: #fff
+    ),
+    // ID 5: Closed (Opale uses the special closed selector)
+    closed: (
+      background: #59636e,
+      color: #fff
+    ),
+    // ID 9: On hold
+    status-9: (
+      background: #b05b73,
+      color: #fff
+    ),
+    // ID 11: Fixed verified
+    status-11: (
+      background: #006b4f,
+      color: #fff
+    ),
+    // ID 13: Needs clarifications
+    status-13: (
+      background: #c56b43,
+      color: #fff
+    ),
+    // ID 15: Acceptance (by client)
+    status-15: (
+      background: #109e13,
+      color: #fff
+    ),
+    // ID 16: Acknowledged
+    status-16: (
+      background: #5e7890,
+      color: #fff
+    ),
+    // ID 17: Needs work
+    status-17: (
+      background: #718b3c,
+      color: #fff
+    ),
+    // ID 18: Quality assurance (internal)
+    status-18: (
+      background: #2b97a8,
+      color: #fff
+    )
+  )
 );
