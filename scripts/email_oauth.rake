@@ -60,7 +60,9 @@ namespace :redmine do
 
       print("Go to URL: #{client.auth_code.authorize_url(scope: scope.join(" "))}\n")
       print("Enter full URL after authorize:")
-      access_token = client.auth_code.get_token(CGI.parse(URI.parse(STDIN.gets.strip).query)["code"].first, client_id: client_id)
+      authorization_url = URI.parse(STDIN.gets.strip)
+      authorization_code = URI.decode_www_form(authorization_url.query).to_h.fetch("code")
+      access_token = client.auth_code.get_token(authorization_code, client_id: client_id)
 
       File.write("#{token_file}.yml", access_token.to_hash.to_yaml)
       File.write("#{token_file}_client.yml", client_config.to_yaml)
