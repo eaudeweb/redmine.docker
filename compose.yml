@@ -6,7 +6,7 @@ services:
     volumes:
       - redmine-files:/usr/src/redmine/files
       - redmine-tmp:/usr/src/redmine/tmp
-      - redmine-repositories:/var/local/redmine/repositories/:Z
+      - redmine-repositories:/var/local/redmine/repositories/
       - redmine-backup:/var/local/redmine/backup/
       - redmine-logs:/usr/src/redmine/log/
       - redmine-imap-oauth:/usr/src/redmine/oauth/
@@ -46,12 +46,12 @@ services:
     restart: unless-stopped
     hostname: helpdesk.eaudeweb.ro
     environment:
-    - MTP_HOST=${MTP_HOST}
-    - MTP_RELAY=${MTP_RELAY}
-    - MTP_PORT=${MTP_PORT}
-    - MTP_USER=${MTP_USER}
-    - MTP_PASS=${MTP_PASS}
-    - MTP_DESTINATION=${MTP_DESTINATION}
+    - MTP_HOST=${MTP_HOST:-}
+    - MTP_RELAY=${MTP_RELAY:-}
+    - MTP_PORT=${MTP_PORT:-}
+    - MTP_USER=${MTP_USER:-}
+    - MTP_PASS=${MTP_PASS:-}
+    - MTP_DESTINATION=${MTP_DESTINATION:-}
 
 volumes:
   redmine-files:

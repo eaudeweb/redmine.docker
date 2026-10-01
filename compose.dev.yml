@@ -15,9 +15,12 @@ services:
 
   smtp:
     container_name: smtp
-    image: eaudeweb/mailtrap
+    image: axllent/mailpit:latest
     ports:
-      - "25:2525"
-      - "127.0.0.1:8025:80"
+      - "25:25"
+      - "127.0.0.1:8025:8025"
     environment:
-      MT_PASSWD: "changeme"
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_BIND_ADDR: 0.0.0.0:25
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
