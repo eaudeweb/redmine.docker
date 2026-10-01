@@ -15,6 +15,12 @@
   gap: 5px;
 }
 
+// Redmine's toolbar stylesheet only sets the table-generator border color.
+// Restore the border itself after the theme's table reset removes it.
+body .table-generator td {
+  border: 2px solid #ccc;
+}
+
 #main > #content > .contextual > .drdn {
   order: 99;
 }
