@@ -1,0 +1,8 @@
+--- app/models/mail_handler.rb
++++ app/models/mail_handler.rb
+@@ -76,7 +76,6 @@
+   cattr_accessor :ignored_emails_headers
+   self.ignored_emails_headers = {
+-    'Auto-Submitted' => /\Aauto-(replied|generated)/,
+     'X-Autoreply' => 'yes'
+   }
