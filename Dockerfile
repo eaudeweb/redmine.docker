@@ -116,6 +116,14 @@ RUN patch -p0 < issues_tree_rails8_routes.patch
 RUN patch -p1 < redmine_44358_images.patch
 RUN patch -p1 < redmine_44358_placeholder.patch
 
+# Keep one shared version constraint; plugin Gemfiles otherwise conflict with Gemfile.local in Bundler.
+RUN for plugin in redmine_people redmine_agile redmine_checklists redmine_favorite_projects redmineup_tags; do \
+    gemfile="plugins/${plugin}/Gemfile"; \
+    if [ -f "${gemfile}" ]; then \
+      sed -i "/^gem 'redmineup'$/d" "${gemfile}"; \
+    fi; \
+    done
+
 RUN gosu redmine bundle install
 
 ENTRYPOINT ["/var/local/redmine/scripts/entrypoint.sh"]
